@@ -8,17 +8,17 @@
 
      - based on state value functions
 
-     Policy evaluation: ![](http://latex.codecogs.com/gif.latex?V^{\pi}(s)= \mathbb{E}_{p(s'|s,a)\pi(a|s)}[r(s,a,s')+\gamma V^{\pi}(s')])
+     Policy evaluation: ![](http://latex.codecogs.com/gif.latex?V^{\pi}(s)=\mathbb{E}_{p(s'|s,a)\pi(a|s)}[r(s,a,s')+\gamma V^{\pi}(s')])
      
-Policy improvement: ![](http://latex.codecogs.com/gif.latex?\pi^*(a|s)\leftarrow \delta (a-a^{\pi}(s)))
+Policy improvement: ![](http://latex.codecogs.com/gif.latex?\pi^*(a|s)\leftarrow\delta(a-a^{\pi}(s)))
      
-where ![](http://latex.codecogs.com/gif.latex?a^{\pi}(s) = argmax_{a\in \mathcal{A}}\{\mathbb{E}_{p(s'|s,a)\pi(a|s)}[r(s,a,s')+\gamma V^{\pi}(s')]\})
+where ![](http://latex.codecogs.com/gif.latex?a^{\pi}(s)=argmax_{a\in\mathcal{A}}\{\mathbb{E}_{p(s'|s,a)\pi(a|s)}[r(s,a,s')+\gammaV^{\pi}(s')]\})
      
 - based on state-action value function
      
-Policy evaluation: ![](http://latex.codecogs.com/gif.latex?Q^{\pi}(s,a)= \mathbb{E}_{\pi(a'|s')p(s'|s,a)}[r(s,a)+\gamma Q^{\pi}(s',a')])
+Policy evaluation: ![](http://latex.codecogs.com/gif.latex?Q^{\pi}(s,a)=\mathbb{E}_{\pi(a'|s')p(s'|s,a)}[r(s,a)+\gammaQ^{\pi}(s',a')])
      
-Policy improvement": ![](http://latex.codecogs.com/gif.latex?\pi^*(a|s)\leftarrow \delta (a-argmax_{a'\in\mathcal{A}}Q^\pi (s,a'))
+Policy improvement": ![](http://latex.codecogs.com/gif.latex?\pi^*(a|s)\leftarrow\delta(a-argmax_{a'\in\mathcal{A}}Q^\pi (s,a'))
      
 - Value function approximation step to regression problem
    
@@ -26,9 +26,9 @@ Policy improvement": ![](http://latex.codecogs.com/gif.latex?\pi^*(a|s)\leftarro
    
   - Reward Regression and algorithm
    
-    ![](http://latex.codecogs.com/gif.latex?\psi(s,a) = \phi(s,a) - \gamma\mathbb{E}_{\pi(a'|s')p(s'|s,a)}[\phi(s',a')])
+    ![](http://latex.codecogs.com/gif.latex?\psi(s,a)=\phi(s,a)-\gamma\mathbb{E}_{\pi(a'|s')p(s'|s,a)}[\phi(s',a')])
    
-    ![](http://latex.codecogs.com/gif.latex?r(s,a) \approx \theta ^T \psi(s,a))
+    ![](http://latex.codecogs.com/gif.latex?r(s,a)\approx\theta^T\psi(s,a))
    
   - Regularization
    
