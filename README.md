@@ -8,7 +8,7 @@
 
      - based on state value functions
 
-     Policy evaluation: ![](http://latex.codecogs.com/gif.latex?V^{\pi}(s)=\mathbb{E}_{p(s'|s,a)\pi(a|s)}[r(s,a,s')+\gamma V^{\pi}(s')])
+     Policy evaluation: ![](http://latex.codecogs.com/gif.latex?V^{\pi}(s)=\mathbb{E}_{p(s'|s,a)\pi(a|s)}[r(s,a,s')+\gammaV^{\pi}(s')])
      
 Policy improvement: ![](http://latex.codecogs.com/gif.latex?\pi^*(a|s)\leftarrow\delta(a-a^{\pi}(s)))
      
