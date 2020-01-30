@@ -4,6 +4,10 @@ from lspi import LSPIAgent
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--env_name', default="CartPole-v0", choices=["CartPole-v0", "MoutainCar-v0"])	# gym env to train
+	parser.add_argument('--episode_num', default=300, type=int)
+	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
+	parser.add_argument('--exploration', default=0.0, type=float)	# 0.0 means no random action
+	parser.add_argument('--basis_function_dim', default=5, type=int)
 
 
 	args = parser.parse_args()
@@ -12,16 +16,14 @@ def main():
 	env = gym.make(params['env_name'])
 
 
-	# get the parameters of env
-	n_actions = env.action_space.n
-	n_observations = env.observation_space.shape[0]
-	params['n_actions'] = n_actions
-	params['n_observations'] = n_observations
-
+	# set the parameters for agent
+	state_dim = env.observation_space.shape[0]
+	# action_dim = 1
+	params['n_actions'] = env.action_space.n
+	params['state_dim'] = state_dim
 
 	n_episode = params['episode_num']
-
-	agent = LSPIAgent()
+	agent = LSPIAgent(params)
 	total_steps = 0
 
 	for i_episode in range(n_episode):
