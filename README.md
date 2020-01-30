@@ -4,27 +4,27 @@
 
 1. Statistical Reinforcement Learning: Chapter 2 - **Policy Iteration with Value Function Approximation**
 
-   - Framework of *policy iteration* 
+   - Framework of ***policy iteration*** 
 
-     - based on state value functions
+     - based on **state value function**
 
-     Policy evaluation: ![](http://latex.codecogs.com/gif.latex?V^{\pi}(s)=\mathbb{E}_{p(s'|s,a)\pi(a|s)}[r(s,a,s')+\gammaV^{\pi}(s')])
+       Policy evaluation: ![](http://latex.codecogs.com/gif.latex?V^{\pi}(s)=\mathbb{E}_{p(s'|s,a)\pi(a|s)}[r(s,a,s')+\gammaV^{\pi}(s')])
      
-Policy improvement: ![](http://latex.codecogs.com/gif.latex?\pi^*(a|s)\leftarrow\delta(a-a^{\pi}(s)))
+  Policy improvement: ![](http://latex.codecogs.com/gif.latex?\pi^*(a|s)\leftarrow\delta(a-a^{\pi}(s)))
      
-where ![](http://latex.codecogs.com/gif.latex?a^{\pi}(s)=argmax_{a\in\mathcal{A}}\{\mathbb{E}_{p(s'|s,a)\pi(a|s)}[r(s,a,s')+\gammaV^{\pi}(s')]\})
+  where ![](http://latex.codecogs.com/gif.latex?a^{\pi}(s)=argmax_{a\in\mathcal{A}}\{\mathbb{E}_{p(s'|s,a)\pi(a|s)}[r(s,a,s')+\gammaV^{\pi}(s')]\})
      
-- based on state-action value function
+- based on **state-action value function**
      
-Policy evaluation: ![](http://latex.codecogs.com/gif.latex?Q^{\pi}(s,a)=\mathbb{E}_{\pi(a'|s')p(s'|s,a)}[r(s,a)+\gammaQ^{\pi}(s',a')])
+  Policy evaluation: ![](http://latex.codecogs.com/gif.latex?Q^{\pi}(s,a)=\mathbb{E}_{\pi(a'|s')p(s'|s,a)}[r(s,a)+\gammaQ^{\pi}(s',a')])
      
-Policy improvement": ![](http://latex.codecogs.com/gif.latex?\pi^*(a|s)\leftarrow\delta(a-argmax_{a'\in\mathcal{A}}Q^\pi (s,a'))
+  Policy improvement": ![](http://latex.codecogs.com/gif.latex?\pi^*(a|s)\leftarrow\delta(a-argmax_{a'\in\mathcal{A}}Q^\pi (s,a'))
      
 - Value function approximation step to regression problem
    
 - Least-squares policy iteration
    
-  - Reward Regression and algorithm
+  - Expected immediate reward Regression and algorithm
    
     ![](http://latex.codecogs.com/gif.latex?\psi(s,a)=\phi(s,a)-\gamma\mathbb{E}_{\pi(a'|s')p(s'|s,a)}[\phi(s',a')])
    

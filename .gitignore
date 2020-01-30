@@ -1,2 +1,14 @@
+# Mac OSX files
 .DS_Store
 
+# pyenv
+.python-version
+
+# virtualenv
+.venv
+venv/
+ENV/
+
+# compiled
+__pycache__/
+resources/
