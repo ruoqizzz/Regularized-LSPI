@@ -5,7 +5,7 @@ from collections import namedtuple
 MAX_BUFFSIZE = 100000
 
 Transition = namedtuple('Transition',
-                        ('observation', 'action','reward', 'next_observation', 'done'))
+                        ('state', 'action','reward', 'next_state', 'done'))
 
 class ReplayBuffer(object):
 	"""docstring for ReplayBuffer"""
@@ -14,9 +14,7 @@ class ReplayBuffer(object):
 		self.buffer_size = buffer_size
 		self.random_seed = random.seed(seed)
 		self.buffer = []
-
 		self.next_index = 0
-
 		self.num_buffer = 0 
 
 
@@ -35,3 +33,8 @@ class ReplayBuffer(object):
 			return random.sample(self.buffer, batch_size)
 		else:
 			return random.sample(self.buffer, self.num_buffer)
+
+	def reset(self):
+		self.buffer = []
+		self.next_index = 0
+		self.num_buffer = 0 
