@@ -1,5 +1,6 @@
 # policy greedy
 import numpy as np
+import random
 class GreedyPolicy(object):
 	"""docstring for GreedyPolicy"""
 	def __init__(self, basis_func, n_actions, epsilon):
@@ -29,7 +30,18 @@ class GreedyPolicy(object):
 		if rng.random() < self.epsilon:
 			return self.actions[index]
 		else:
-			return random.sample(self.actions,1)
+			# print(self.actions)
+			return random.sample(self.actions,1)[0]
+
+	def get_best_action(self, state, opt='random'):
+		q_state_actions = [self.q_state_action_func(state, a) for a in self.actions]
+		q_state_actions = np.reshape(q_state_actions, [len(q_state_actions), 1]) # convert to column vector
+		index = np.argmax(q_state_actions)
+		q_max = q_state_actions[index]
+		best_action = self.actions[index]
+		rng = np.random.default_rng()
+		return self.actions[index]
+
 	
 	def update_weights(self, new_weights):
 		self.weights = new_weights

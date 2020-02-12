@@ -4,14 +4,15 @@ from replay_buffer import ReplayBuffer
 import gym
 import gymgrid
 from inverted_pendulum import InvertedPendulumEnv
-
+import time
 
 def main():
 	parser = argparse.ArgumentParser()
+# -*- coding: utf-8 -*-
 	parser.add_argument('--env_name', default="inverted_pedulum", choices=["cliff-v0","CartPole-v0", "MoutainCar-v0","inverted_pedulum"])	# gym env to train
 	parser.add_argument('--episode_num', default=10000, type=int)
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
-	parser.add_argument('--exploration', default=0.0, type=float)	# 0.0 means no random action
+	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
 	parser.add_argument('--basis_function_dim', default=10, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
 	parser.add_argument('--learning_start', default=1000, type=int)
@@ -30,6 +31,7 @@ def main():
 	state_dim = env.observation_space.shape[0]
 	# action_dim = 1
 	params['n_actions'] = env.action_space.n
+	# print('n_actions: {}'.format(params['n_actions']))
 	params['state_dim'] = state_dim
 	batch_size = params['batch_size']
 	update_freq = params['update_freq']
@@ -69,7 +71,9 @@ def main():
 				# print("i_episode_steps {}".format(i_episode_steps))
 				print("total_reward {}".format(total_reward))
 				history.append(total_reward)
+				# time.sleep(0.1)
 				break
+
 	env.close()
 	replay_buffer.reset()
 
