@@ -25,6 +25,7 @@ class GreedyPolicy(object):
 		q_max = q_state_actions[index]
 		best_action = self.actions[index]
 		rng = np.random.default_rng()
+		# epsilon greedy
 		if rng.random() < self.epsilon:
 			return self.actions[index]
 		else:

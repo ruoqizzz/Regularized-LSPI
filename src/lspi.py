@@ -15,7 +15,7 @@ class LSPIAgent(object):
 		self.basisfunc_dim = param['basis_function_dim']
 		self.gamma = param['weight_discount']
 		self.stop_criterion = param['stop_criterion']
-
+		
 		self.basis_function = RBF(self.state_dim, self.basisfunc_dim, self.n_actions, self.gamma)
 		self.n_basis_func = self.basis_function.size()
 		epsilon = 1-param['exploration']
@@ -51,6 +51,7 @@ class LSTDQ(object):
 		n = self.basis_function.size()
 		A = np.zeros([n, n])
 		b = np.zeros([n, 1])
+		# l2 weights here:
 		np.fill_diagonal(A, .1)  # Singular matrix error
 
 		for s in samples:
