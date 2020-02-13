@@ -4,12 +4,13 @@ from replay_buffer import ReplayBuffer
 import gym
 import gymgrid
 from env.inverted_pendulum import InvertedPendulumEnv
+from env.linear_quadratic_regulator import LQREnv
 import time
 
 def main():
 	parser = argparse.ArgumentParser()
 # -*- coding: utf-8 -*-
-	parser.add_argument('--env_name', default="inverted_pedulum", choices=["cliff-v0","CartPole-v0", "MoutainCar-v0","inverted_pedulum"])	# gym env to train
+	parser.add_argument('--env_name', default="LQR", choices=["cliff-v0","CartPole-v0","inverted_pedulum","LQR"])	# gym env to train
 	parser.add_argument('--episode_num', default=10000, type=int)
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
@@ -23,6 +24,8 @@ def main():
 
 	if params['env_name']=="inverted_pedulum":
 		env = InvertedPendulumEnv()
+	elif params['env_name']=="LQR":
+		env = LQREnv()
 	else:
 		env = gym.make(params['env_name'])
 
