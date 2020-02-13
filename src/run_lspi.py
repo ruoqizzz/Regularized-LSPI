@@ -3,7 +3,7 @@ from lspi import LSPIAgent
 from replay_buffer import ReplayBuffer
 import gym
 import gymgrid
-from inverted_pendulum import InvertedPendulumEnv
+from env.inverted_pendulum import InvertedPendulumEnv
 import time
 
 def main():

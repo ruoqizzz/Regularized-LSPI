@@ -7,7 +7,7 @@
 # virtualenv
 .venv
 venv/
-ENV/
+
 
 # compiled
 __pycache__/

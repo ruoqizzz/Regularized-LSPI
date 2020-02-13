@@ -49,7 +49,7 @@ class InvertedPendulumEnv(gym.Env):
         # costs = angle_normalize(th)**2 + .1*thdot**2 + .001*(u**2)
         done = False
 
-        if th>= -np.pi/2 and th<=0:
+        if th==0:
             reward = 0
         else:
             reward = -1
@@ -66,8 +66,8 @@ class InvertedPendulumEnv(gym.Env):
 
     def reset(self):
         # angle_normalize
-        high = np.array([np.pi/2, 1])
-        self.state = self.np_random.uniform(low=-high, high=np.array([0,1]))
+        high = np.array([np.pi, 1])
+        self.state = self.np_random.uniform(low=-high, high=high)
         # self.state = np.array([-np.pi/2,0])
         th, thdot = self.state
         th = angle_normalize(th)
