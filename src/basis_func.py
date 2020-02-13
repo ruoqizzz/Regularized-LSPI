@@ -29,7 +29,30 @@ class RBF(object):
 		phi[offset+1:offset+1+len(rbf)] = rbf
 		return phi
 
+class ExactFunc4LQR(object):
+	"""docstring for ExactFunc4LQR"""
+	def __init__(self, n_actions):
+		super(ExactFunc4LQR, self).__init__()
+		self.n_features = 4
+		self.n_actions = n_actions
+	
 
+	def size(self):
+		return self.n_features * self.n_actions
+
+	def evaluate(self, state, action):
+		n = self.size()
+		phi = np.zeros((n, ))
+
+        offset = (n/self.num_actions)*action
+        
+        value = state
+
+        offset_phi = np.array([1, pow(value,2), pow(action,2), value*action])
+
+        phi[offset:offset + self.degree + 1] = offset_phi
+
+        return phi
 
 
 
