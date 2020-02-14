@@ -29,10 +29,11 @@ class RBF(object):
 		phi[offset+1:offset+1+len(rbf)] = rbf
 		return phi
 
-class ExactFunc4LQR(object):
-	"""docstring for ExactFunc4LQR"""
+
+class ExactBasis4LQR(object):
+	"""docstring for ExactBasis4LQR"""
 	def __init__(self, n_actions):
-		super(ExactFunc4LQR, self).__init__()
+		super(ExactBasis4LQR, self).__init__()
 		self.n_features = 4
 		self.n_actions = n_actions
 	
@@ -44,17 +45,30 @@ class ExactFunc4LQR(object):
 		n = self.size()
 		phi = np.zeros((n, ))
 
-        offset = (n/self.num_actions)*action
-        
-        value = state
+		offset = (n/self.n_actions)*action  
+		value = state
+		offset_phi = np.array([1, value**2, action**2, value*action])
+		phi[offset:offset + self.n_features] = offset_phi
 
-        offset_phi = np.array([1, pow(value,2), pow(action,2), value*action])
+		return phi
 
-        phi[offset:offset + self.degree + 1] = offset_phi
+class Polinomial4DiscreteState(object):
+	"""docstring for Polinomial4DiscreteState"""
+	def __init__(self, degree,n_actions):
+		super(Polinomial4DiscreteState, self).__init__()
+		self.n_actions = n_actions
+		self.n_features = degree+1	# e.g. 2 [1,s,s**2]
+		# self.degree = degree
+	def size(self):
+		return self.n_features * self.n_actions
 
-        return phi
-
-
-
-
+	def evaluate(self, state, action):
+		n = self.size()
+		phi = np.zeros((n, ))
+		offset = self.n_features*action
+		
+		value = state
+		offset_phi = [ np.power(value, d) for d in range(self.n_features)]
+		phi[offset:offset + self.n_features] = offset_phi
+		return phi
 		

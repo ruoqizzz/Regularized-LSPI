@@ -16,7 +16,11 @@ class InvertedPendulumEnv(gym.Env):
         self.dt=.05
         self.g = g
         self.m = 1.
+        # self.m = 2.
+        # self.M = 8.
         self.l = 1.
+        # self.a = 1.0/(self.m+self.M)
+        # self.l = 1./2.
         self.viewer = None
 
         high = np.array([1., 1., self.max_speed])
@@ -35,13 +39,15 @@ class InvertedPendulumEnv(gym.Env):
 
         g = self.g
         m = self.m
+        # M = self.M
+        # a = self.a
         l = self.l
         dt = self.dt
         # note: here u is torch not force in the paper
         random_torch = np.random.uniform(-0.2, 0.2)
-        # -: left force 
+        # -: left force
         # +: right forces
-        if action==0:   u = -1.8 + random_torch 
+        if action==0:   u = -1.8 + random_torch
         elif action==1: u = 1.8 + random_torch
         else:           u = 0. + random_torch
         # u = np.clip(u, -self.max_torque, self.max_torque)[0]

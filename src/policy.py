@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # policy greedy
 import numpy as np
 import random
@@ -42,7 +43,6 @@ class GreedyPolicy(object):
 		rng = np.random.default_rng()
 		return self.actions[index]
 
-	
+
 	def update_weights(self, new_weights):
 		self.weights = new_weights
-	

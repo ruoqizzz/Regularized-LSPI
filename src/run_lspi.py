@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import argparse
 from lspi import LSPIAgent
 from replay_buffer import ReplayBuffer
@@ -5,12 +6,13 @@ import gym
 import gymgrid
 from env.inverted_pendulum import InvertedPendulumEnv
 from env.linear_quadratic_regulator import LQREnv
+from env.chain import ChainEnv
 import time
 
 def main():
 	parser = argparse.ArgumentParser()
 # -*- coding: utf-8 -*-
-	parser.add_argument('--env_name', default="LQR", choices=["cliff-v0","CartPole-v0","inverted_pedulum","LQR"])	# gym env to train
+	parser.add_argument('--env_name', default="chain", choices=["cliff-v0","CartPole-v0","inverted_pedulum","LQR","chain"])	# gym env to train
 	parser.add_argument('--episode_num', default=10000, type=int)
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
@@ -26,12 +28,18 @@ def main():
 		env = InvertedPendulumEnv()
 	elif params['env_name']=="LQR":
 		env = LQREnv()
+	elif params['env_name']=="chain":
+		env = ChainEnv()
 	else:
 		env = gym.make(params['env_name'])
 
 
 	# set the parameters for agent
-	state_dim = env.observation_space.shape[0]
+
+	if params['env_name']=="chain":
+		state_dim = env.observation_space.n
+	else:
+		state_dim = env.observation_space.shape[0]
 	# action_dim = 1
 	params['n_actions'] = env.action_space.n
 	# print('n_actions: {}'.format(params['n_actions']))
@@ -54,7 +62,7 @@ def main():
 			total_steps += 1
 			# if total_steps > params['learning_start']:
 			# 	env.render()
-			# env.render() 
+			# env.render()
 			action = agent.get_action(state)
 			state_, reward, done, info = env.step(action)
 			if params['env_name']=="CartPole-v0":

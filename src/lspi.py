@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 # agent
-from basis_func import RBF
+from basis_func import *
 from policy import GreedyPolicy
 from collections import namedtuple
 import numpy as np
@@ -19,8 +20,9 @@ class LSPIAgent(object):
 		self.basisfunc_dim = param['basis_function_dim']
 		self.gamma = param['weight_discount']
 		self.stop_criterion = param['stop_criterion']
-		
-		self.basis_function = RBF(self.state_dim, self.basisfunc_dim, self.n_actions, self.gamma)
+
+		# self.basis_function = RBF(self.state_dim, self.basisfunc_dim, self.n_actions, self.gamma)
+		self.basis_function = Polinomial4DiscreteState(2,self.n_actions)
 		self.n_basis_func = self.basis_function.size()
 		epsilon = 1-param['exploration']
 		self.policy = GreedyPolicy(self.basis_function, self.n_actions, epsilon)
@@ -32,7 +34,7 @@ class LSPIAgent(object):
 		error = float('inf')
 		error_his = []
 		i_iter = 0
-		while error > self.stop_criterion and i_iter<self.n_iter_max: 
+		while error > self.stop_criterion and i_iter<self.n_iter_max:
 			new_weights = self.lstdq.training(sample, self.policy)
 			error = np.linalg.norm((new_weights - self.policy.weights))
 			print("error when update_weights in interation {}: {}".format(i_iter,error))
@@ -106,4 +108,3 @@ class LSTDQ(object):
 		# inv_A = np.linalg.inv(A)
 		# w = np.dot(inv_A, b)
 		# return w
-

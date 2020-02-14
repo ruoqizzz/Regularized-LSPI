@@ -7,7 +7,7 @@ class LQREnv(object):
 	def __init__(self, A=0.9, B=1., Z1=1., Z2=1., noise_cov = 1., seed=1):
 		'''
 		A,B are some Matrices here
-		Z1,Z2 are some positive semi-definite weight matrices 
+		Z1,Z2 are some positive semi-definite weight matrices
 			that determines the trade-off between keeping state small and keeping action small.
 		'''
 		super(LQREnv, self).__init__()
@@ -22,6 +22,7 @@ class LQREnv(object):
 		self.rng = self.set_seed(seed)
 
 		high = np.array([1.])
+		# TODO: Action now is continous
 		self.action_space = Box(low=-high, high=high, dtype=np.float32)
 		self.observation_space = Box(low=-high, high=high, dtype=np.float32)
 
@@ -57,5 +58,3 @@ class LQREnv(object):
 
 	def close(self):
 		self.state = None
-
-		

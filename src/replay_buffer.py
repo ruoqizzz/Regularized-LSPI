@@ -1,6 +1,6 @@
+# -*- coding: utf-8 -*-
 import random
 from collections import namedtuple
-
 
 MAX_BUFFSIZE = 100000
 
@@ -15,7 +15,7 @@ class ReplayBuffer(object):
 		self.random_seed = random.seed(seed)
 		self.buffer = []
 		self.next_index = 0
-		self.num_buffer = 0 
+		self.num_buffer = 0
 
 
 	def store(self, *transition):
@@ -39,4 +39,4 @@ class ReplayBuffer(object):
 	def reset(self):
 		self.buffer = []
 		self.next_index = 0
-		self.num_buffer = 0 
+		self.num_buffer = 0
