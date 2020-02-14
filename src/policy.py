@@ -20,7 +20,7 @@ class GreedyPolicy(object):
 		vector_basis = self.basis_func.evaluate(state,action)
 		return np.dot(vector_basis, self.weights)  # pi(s, a) * weights
 
-	def get_best_action_epsilon(self, state, opt='random'):
+	def get_best_action_epsilon(self, state):
 		q_state_actions = [self.q_state_action_func(state, a) for a in self.actions]
 		q_state_actions = np.reshape(q_state_actions, [len(q_state_actions), 1]) # convert to column vector
 		index = np.argmax(q_state_actions)
@@ -34,7 +34,7 @@ class GreedyPolicy(object):
 			# print(self.actions)
 			return random.sample(self.actions,1)[0]
 
-	def get_best_action(self, state, opt='random'):
+	def get_best_action(self, state):
 		q_state_actions = [self.q_state_action_func(state, a) for a in self.actions]
 		q_state_actions = np.reshape(q_state_actions, [len(q_state_actions), 1]) # convert to column vector
 		index = np.argmax(q_state_actions)
@@ -46,3 +46,22 @@ class GreedyPolicy(object):
 
 	def update_weights(self, new_weights):
 		self.weights = new_weights
+
+
+class ExactPolicy4LQR(object):
+	"""docstring for ExactPolicy4LQR"""
+	def __init__(self, L=0.3, epsilon):
+		super(ExactPolicy4LQR, self).__init__()
+		self.L = L
+		self.epsilon = epsilon
+
+	def get_best_action(self, state):
+		return -self.L*state
+
+	def get_best_action_epsilon(self, state):
+		pass
+
+	
+		
+
+		

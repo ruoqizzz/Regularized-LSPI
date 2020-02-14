@@ -32,25 +32,20 @@ class RBF(object):
 
 class ExactBasis4LQR(object):
 	"""docstring for ExactBasis4LQR"""
-	def __init__(self, n_actions):
+	def __init__(self):
 		super(ExactBasis4LQR, self).__init__()
 		self.n_features = 4
-		self.n_actions = n_actions
 	
-
 	def size(self):
-		return self.n_features * self.n_actions
+		return self.n_features
 
 	def evaluate(self, state, action):
 		n = self.size()
 		phi = np.zeros((n, ))
-
-		offset = (n/self.n_actions)*action  
 		value = state
 		offset_phi = np.array([1, value**2, action**2, value*action])
-		phi[offset:offset + self.n_features] = offset_phi
-
 		return phi
+		
 
 class Polinomial4DiscreteState(object):
 	"""docstring for Polinomial4DiscreteState"""

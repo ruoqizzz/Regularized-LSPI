@@ -5,10 +5,11 @@ import random
 
 class ChainEnv(object):
 	"""docstring for ChainEnv"""
-	def __init__(self, n_states=4, n_actions=2, failure_probability=0.1):
+	def __init__(self, n_states=4, failure_probability=0.1):
 		super(ChainEnv, self).__init__()
 		self.n_states = n_states
-		self.n_actions = n_actions
+		# always 2 : [0,1] = ['left', 'right']
+		self.n_actions = 2
 		self.failure_prob = failure_probability
 
 		self.action_space = Discrete(self.n_actions)

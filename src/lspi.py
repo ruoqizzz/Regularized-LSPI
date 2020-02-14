@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # agent
 from basis_func import *
-from policy import GreedyPolicy
+from policy import *
 from collections import namedtuple
 import numpy as np
 import scipy
@@ -11,21 +11,20 @@ import time
 Transition = namedtuple('Transition',
 						('state', 'action','reward', 'next_state', 'done'))
 
+
 class LSPIAgent(object):
 	"""docstring for LSPIAgent"""
-	def __init__(self, param):
+	def __init__(self, params):
 		super(LSPIAgent, self).__init__()
-		self.state_dim = param['state_dim']
-		self.n_actions = param['n_actions']
-		self.basisfunc_dim = param['basis_function_dim']
-		self.gamma = param['weight_discount']
-		self.stop_criterion = param['stop_criterion']
-
-		# self.basis_function = RBF(self.state_dim, self.basisfunc_dim, self.n_actions, self.gamma)
-		self.basis_function = Polinomial4DiscreteState(2,self.n_actions)
+		self.state_dim = params['state_dim']
+		# self.n_actions = params['n_actions']
+		self.basisfunc_dim = params['basis_function_dim']
+		self.gamma = params['weight_discount']
+		self.stop_criterion = params['stop_criterion']
+		self.basis_function = params['basis_func'] 
 		self.n_basis_func = self.basis_function.size()
-		epsilon = 1-param['exploration']
-		self.policy = GreedyPolicy(self.basis_function, self.n_actions, epsilon)
+		epsilon = 1-params['exploration']
+		self.policy = params['policy']
 		# print(self.policy.weights)
 		self.lstdq = LSTDQ(self.basis_function, self.gamma)
 		self.n_iter_max = 30
@@ -49,6 +48,7 @@ class LSPIAgent(object):
 
 	def get_action(self, state):
 		return self.policy.get_best_action_epsilon(state)
+		# return self.policy.get_action_LQR(state)
 
 
 class LSTDQ(object):
