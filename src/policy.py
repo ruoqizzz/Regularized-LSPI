@@ -67,13 +67,24 @@ class ExactPolicy4LQR(object):
 
 	def get_best_action(self, state):
 		# [1, s.T*s, s.T*u, u.T*u] 
-		# print("state: {}".format(state))
-		if(state==np.matrix(np.nan)):
-			exit()
-		# print("weights: {}".format(self.weights))
-		w3 = self.weights[2][0]
-		w4 = self.weights[3][0]
-		return -w3/(2*w4) * state
+		print("state: {}".format(state))
+		print("weights: {}".format(self.weights))
+		w3 = self.weights.getA()[2][0]
+		w4 = self.weights.getA()[3][0]
+		action = -w4/(2*w3) * state
+		# action = - 0.1 * state
+		print("action: {}".format(action))
+		return action
+
+	def get_action_with_L(self, state, L):
+		# [1, s.T*s, s.T*u, u.T*u] 
+		print("state: {}".format(state))
+		print("weights: {}".format(self.weights))
+		w3 = self.weights.getA()[2][0]
+		w4 = self.weights.getA()[3][0]
+		action = - L * state
+		print("action: {}".format(action))
+		return action.item()
 
 	def get_best_action_noise(self, state):
 		u = self.get_best_action(state)
@@ -82,7 +93,7 @@ class ExactPolicy4LQR(object):
 		return u + np.random.normal(0,1,m)
 
 	def update_weights(self, new_weights):
-		self.weights = new_weights
+		self.weights = np.matrix(new_weights)
 
 	
 		

@@ -3,14 +3,15 @@ from .spaces.box import *
 from .spaces.discrete import *
 import random
 from numpy import matlib as mb
+import scipy.linalg
 
 class LQREnv(object):
 	"""docstring for LQREnv"""
-	def __init__(self, A=np.matrix(0.9), 
+	def __init__(self, A=np.matrix(0.3), 
 					   B=np.matrix(1.), 
 					   Z1=np.matrix(1.), 
 					   Z2=np.matrix(1.), 
-					   noise_cov=1.0, 
+					   noise_cov=np.matrix(1.), 
 					   seed=1):
 		'''
 		A,B are some Matrices here
@@ -53,12 +54,12 @@ class LQREnv(object):
 		x = self.state
 		# cost matrix size 1x1
 		cost = x.T*self.Z1*x + u.T*self.Z2*u
-		return -1*float(cost)
+		return -float(cost)
 
 
 	def step(self, action):
 		reward = self.calcu_reward(action)
-		noise = self.rng.normal(self.noise_mu, self.noise_cov, 1)[0]
+		noise = self.rng.normal(self.noise_mu, self.noise_cov, self.m)
 		# change to matrix 
 		# print("action: {}".format(action))
 		new_state = self.A*self.state + self.B*action + noise
@@ -82,14 +83,43 @@ class LQREnv(object):
 	def close(self):
 		self.state = None
 
-	def true_Qvalue(self, L, state, action):
+	def true_weights(self, L, gamma):
 		# state and action np.matrix mx1
+		Z1 = self.Z1
+		Z2 = self.Z2
+		A = self.A
+		B = self.B
+
+		q = Z1 + L.T*Z2*L
+		a = np.sqrt(gamma)*(A-B*L)
+		
+		P = scipy.linalg.solve_discrete_lyapunov(a, q)
+
+		w1 = gamma/(1-gamma)*np.trace(P)
+		w2 = (Z1 + gamma*A.T*P*A).item()
+		w3 = (Z2 + gamma*B.T*P*B).item()
+		w4 = (2*gamma*A.T*P*B).item()
+
+		return np.matrix([w1,w2,w3,w4]).reshape(4,1)
+
+	def true_Qvalue(self, L, gamma, state, action):
 		x = state
 		u = action
 		Z1 = self.Z1
 		Z2 = self.Z2
-		q_value = 0
+		A = self.A
+		B = self.B
 
-		# calcu Q
+		q = Z1 + L.T*Z2*L
+		a = np.sqrt(gamma)*(A-B*L)
+		
+		P = scipy.linalg.solve_discrete_lyapunov(a, q)
+
+		w1 = gamma/(1-gamma)*np.trace(P)
+		w2 = Z1 + gamma*A.T*P*A
+		w3 = Z2 + gamma*B.T*P*B
+		w4 = 2*gamma*A.T*P*B
+		q_value = -(x.T*w2*x + u.T*w3*u + x.T*w4*u + w4).item()
 
 		return q_value
+

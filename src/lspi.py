@@ -44,7 +44,8 @@ class LSPIAgent(object):
 		# time.sleep(2)
 		# print(error_his)
 		# print(self.policy.weights)
-		return error_his
+		
+		return error_his, self.policy.weights
 
 
 	def get_action(self, state):

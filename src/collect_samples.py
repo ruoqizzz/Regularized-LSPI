@@ -34,7 +34,7 @@ def collect_samples_gaussian(env, max_steps):
 	i_episode_steps = 0
 	state = env.reset()
 	done  = False
-	while True and i_episode_steps<max_steps:
+	while i_episode_steps<max_steps:
 		i_episode_steps += 1
 		# action = env.action_space.sample()
 		action = np.matrix(np.random.normal(0, 1, 1)[0])
