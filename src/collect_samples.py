@@ -24,6 +24,7 @@ def collect_samples(env, agent, max_episodes, max_steps, option):
 				action = agent.get_action(state)
 			state_, reward, done, info = env.step(action)
 			replay_buffer.store(state, action, reward, state_, done)
+			state = state_
 			if done:
 				break
 	return replay_buffer
@@ -40,8 +41,7 @@ def collect_samples_gaussian(env, max_steps):
 		action = np.matrix(np.random.normal(0, 1, 1)[0])
 		state_, reward, done, info = env.step(action)
 		replay_buffer.store(state, action, reward, state_, done)
-		if done:
-			break
+		state = state_
 	return replay_buffer
 
 

@@ -21,9 +21,9 @@ def main():
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
 	parser.add_argument('--basis_function_dim', default=10, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
-	parser.add_argument('--sample_max_steps', default=40000, type=int)
+	parser.add_argument('--sample_max_steps', default=2000, type=int)
 	parser.add_argument('--max_steps', default=500, type=int)
-	parser.add_argument('--batch_size', default=20000, type=int)
+	parser.add_argument('--batch_size', default=2000, type=int)
 	parser.add_argument('--update_freq', default=10000000, type=int)
 	args = parser.parse_args()
 	params = vars(args)
@@ -60,10 +60,10 @@ def main():
 	# for i in range(len(states)):
 	# 	state = states[i]
 	# 	action = actions[i]
-		# q_estimate = (agent.policy.q_state_action_func(state, action)).item()
-		# q_true = env.true_Qvalue(L, gamma, state, action)
-		# q_estimate_his.append(q_estimate)
-		# q_true_his.append(q_true)
+	# 	q_estimate = (agent.policy.q_state_action_func(state, action)).item()
+	# 	q_true = env.true_Qvalue(L, gamma, state, action)
+	# 	q_estimate_his.append(q_estimate)
+	# 	q_true_his.append(q_true)
 
 
 	state = np.matrix(-1.)
@@ -115,12 +115,15 @@ def main():
 
 	plt.subplot(211)
 	plt.plot(actions, q_estimate_his)
+	plt.title('q estimate')
 
 	plt.subplot(212)
 	plt.plot(actions, q_true_his)
+	plt.title('q true')
 	plt.show()
 
-	# # plot
+	# plot
+	# plt.title('state from -2 to 2 and action(-L*state)')
 	# plt.subplot(411)
 	# plt.plot(states)
 	# plt.title('state')

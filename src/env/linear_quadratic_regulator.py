@@ -31,7 +31,7 @@ class LQREnv(object):
 		self.Z2 = Z2
 		self.state = None
 		# noisy
-		self.noise_mu = 0.
+		self.noise_mu = np.matrix(0.)
 		self.noise_cov = noise_cov
 		self.rng = self.set_seed(seed)
 

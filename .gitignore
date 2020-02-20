@@ -22,3 +22,6 @@ resources/
 
 # output log
 *.txt
+
+# debug file
+debug*
