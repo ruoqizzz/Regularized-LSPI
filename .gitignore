@@ -14,3 +14,11 @@ __pycache__/
 resources/
 .ipynb_checkpoints/
 *.ipynb
+
+
+# images
+*.png
+*.jpg
+
+# output log
+*.txt

@@ -42,9 +42,11 @@ class ExactBasis4LQR(object):
 	def evaluate(self, state, action):
 		n = self.size()
 		phi = np.zeros((n, ))
-		value = state
-		offset_phi = np.array([1, value**2, action**2, value*action])
-		return phi
+		s = float(state)
+		u = float(action)
+		offset_phi = np.array([1, s*s, s*u, u*u])
+		# print("in basis evaluate phi_next: {}".format(offset_phi))
+		return offset_phi
 		
 
 class Polinomial4DiscreteState(object):

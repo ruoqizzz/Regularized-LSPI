@@ -2,6 +2,8 @@
 # policy greedy
 import numpy as np
 import random
+from numpy import matlib as mb
+
 class GreedyPolicy(object):
 	"""docstring for GreedyPolicy"""
 	def __init__(self, basis_func, n_actions, epsilon):
@@ -50,16 +52,37 @@ class GreedyPolicy(object):
 
 class ExactPolicy4LQR(object):
 	"""docstring for ExactPolicy4LQR"""
-	def __init__(self, L=0.3, epsilon):
+	def __init__(self, basis_func, L=np.matrix(0.3), epsilon=0.1):
 		super(ExactPolicy4LQR, self).__init__()
 		self.L = L
 		self.epsilon = epsilon
+		self.basis_func = basis_func
+		n = basis_func.size()
+		self.weights = mb.rand(n,1)
+
+	def q_state_action_func(self, state, action):
+		basis = self.basis_func.evaluate(state,action)
+		return basis.T * self.weights
+
 
 	def get_best_action(self, state):
-		return -self.L*state
+		# [1, s.T*s, s.T*u, u.T*u] 
+		# print("state: {}".format(state))
+		if(state==np.matrix(np.nan)):
+			exit()
+		# print("weights: {}".format(self.weights))
+		w3 = self.weights[2][0]
+		w4 = self.weights[3][0]
+		return -w3/(2*w4) * state
 
-	def get_best_action_epsilon(self, state):
-		pass
+	def get_best_action_noise(self, state):
+		u = self.get_best_action(state)
+		m = u.shape[0]
+		# noise is scala or vector? 
+		return u + np.random.normal(0,1,m)
+
+	def update_weights(self, new_weights):
+		self.weights = new_weights
 
 	
 		
