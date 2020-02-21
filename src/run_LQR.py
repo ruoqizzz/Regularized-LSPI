@@ -11,6 +11,7 @@ from collect_samples import *
 from policy import *
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 
 def main():
 
@@ -32,7 +33,11 @@ def main():
 	params['n_actions'] = env.action_space.shape[0]
 	params['state_dim'] = env.observation_space.shape[0]
 	params['basis_func'] = ExactBasis4LQR()
-	L=np.matrix(0.3)
+
+
+
+
+	L=np.matrix(0.1)
 	gamma = params['weight_discount']
 	params['policy'] = ExactPolicy4LQR(params['basis_func'], L, 1-params['exploration'])
 
@@ -54,16 +59,7 @@ def main():
 	sample = replay_buffer.sample(batch_size)
 	error_list, new_weights = agent.train(sample)
 
-	# states = np.linspace(-2.0, 2.0, 100)
-	# actions = -.3*states
 
-	# for i in range(len(states)):
-	# 	state = states[i]
-	# 	action = actions[i]
-	# 	q_estimate = (agent.policy.q_state_action_func(state, action)).item()
-	# 	q_true = env.true_Qvalue(L, gamma, state, action)
-	# 	q_estimate_his.append(q_estimate)
-	# 	q_true_his.append(q_true)
 
 
 	state = np.matrix(-1.)
@@ -72,9 +68,67 @@ def main():
 	for i in range(len(actions)):
 		action = np.matrix(actions[i])
 		q_estimate = (agent.policy.q_state_action_func(state, action)).item()
+		# print("q_estimate: {}".format(q_estimate))
+		q_true = env.true_Qvalue(L, gamma, state, action)
+		# print("q_true: {}".format(q_true))
+		q_estimate_his.append(q_estimate)
+		q_true_his.append(q_true)
+
+	true_weights = env.true_weights(L, gamma)
+	print("true_weights: {}".format(true_weights))
+	estimate_weights = agent.policy.weights
+	print("estimate_weights: {}".format(estimate_weights))
+	true_estimate_error = np.linalg.norm(true_weights-estimate_weights)
+	print("true_estimate_error: {}".format(true_estimate_error))
+
+	now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
+
+	plt.figure(figsize=(8, 6))
+	plt.subplot(211)
+	plt.plot(actions, q_estimate_his)
+	plt.title('q estimate')
+
+	plt.subplot(212)
+	plt.plot(actions, q_true_his)
+	plt.title('q true')
+	plt.savefig(now+"q_true&estimate-action(-1,1)")
+	plt.show()
+
+
+	states = np.linspace(-2.0, 2.0, 100)
+	actions = -L.item()*states
+
+	for i in range(len(states)):
+		state = states[i]
+		action = actions[i]
+		q_estimate = (agent.policy.q_state_action_func(state, action)).item()
 		q_true = env.true_Qvalue(L, gamma, state, action)
 		q_estimate_his.append(q_estimate)
 		q_true_his.append(q_true)
+
+	now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
+	# plot
+	plt.figure(figsize=(10, 10))
+	plt.title('state from -2 to 2 and action(-L*state)')
+	plt.subplot(411)
+	plt.plot(states)
+	plt.title('state')
+
+	plt.subplot(412)
+	plt.plot(actions)
+	plt.title('actions')
+	# plt.show()
+
+	plt.subplot(413)
+	plt.plot(q_true_his)
+	plt.title('true Q')
+	# plt.show()
+
+	plt.subplot(414)
+	plt.plot(q_estimate_his)
+	plt.title('estimate Q')
+	plt.savefig(now+"q_true&estimate-state(-2,2)")
+	plt.show()
 
 
 	# q_estimate = 0.0
@@ -112,46 +166,6 @@ def main():
 
 	env.close()
 	replay_buffer.reset()
-
-	plt.subplot(211)
-	plt.plot(actions, q_estimate_his)
-	plt.title('q estimate')
-
-	plt.subplot(212)
-	plt.plot(actions, q_true_his)
-	plt.title('q true')
-	plt.show()
-
-	# plot
-	# plt.title('state from -2 to 2 and action(-L*state)')
-	# plt.subplot(411)
-	# plt.plot(states)
-	# plt.title('state')
-
-	# plt.subplot(412)
-	# plt.plot(actions)
-	# plt.title('actions')
-	# # plt.show()
-
-	# plt.subplot(413)
-	# plt.plot(q_true_his)
-	# plt.title('true Q')
-	# # plt.show()
-
-	# plt.subplot(414)
-	# plt.plot(q_estimate_his)
-	# plt.title('estimate Q')
-	# plt.show()
-
-
-
-	# plt.subplot(313)
-	# plt.plot(true_estimate_error_history)
-	# plt.title('weights error')
-	# plt.show()
-	# print("true_estimate_error_history: {}".format(true_estimate_error_history))
-	# print("true_weights: {}".format(true_weights_his))
-	
 
 if __name__ == '__main__':
 	main()

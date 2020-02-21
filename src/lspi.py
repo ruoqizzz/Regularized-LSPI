@@ -103,7 +103,7 @@ class LSTDQ(object):
 
 			phi = self.basis_function.evaluate(state, action)
 			if not done:
-				_action = policy.get_best_action(state)
+				_action = policy.get_action_training(state)
 				# print("_action: {}".format(_action))
 				phi_next = self.basis_function.evaluate(next_state, _action)
 				# print("phi_next: {}".format(phi_next))

@@ -45,6 +45,8 @@ class GreedyPolicy(object):
 		rng = np.random.default_rng()
 		return self.actions[index]
 
+	def get_action_training(self, state):
+		return self.get_best_action(state)
 
 	def update_weights(self, new_weights):
 		self.weights = new_weights
@@ -76,15 +78,18 @@ class ExactPolicy4LQR(object):
 		print("action: {}".format(action))
 		return action
 
-	def get_action_with_L(self, state, L):
+	def get_action_with_L(self, state):
 		# [1, s.T*s, s.T*u, u.T*u] 
 		print("state: {}".format(state))
 		print("weights: {}".format(self.weights))
 		w3 = self.weights.getA()[2][0]
 		w4 = self.weights.getA()[3][0]
-		action = - L * state
+		action = - self.L * state
 		print("action: {}".format(action))
-		return action.item()
+		return action
+
+	def get_action_training(self, state):
+		return self.get_action_with_L(state)
 
 	def get_best_action_noise(self, state):
 		u = self.get_best_action(state)

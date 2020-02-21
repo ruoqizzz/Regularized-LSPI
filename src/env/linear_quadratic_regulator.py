@@ -90,7 +90,7 @@ class LQREnv(object):
 		A = self.A
 		B = self.B
 
-		q = Z1 + L.T*Z2*L
+		q = Z1 + L.T*Z2*L 
 		a = np.sqrt(gamma)*(A-B*L)
 		
 		P = scipy.linalg.solve_discrete_lyapunov(a, q)
@@ -111,7 +111,7 @@ class LQREnv(object):
 		B = self.B
 
 		q = Z1 + L.T*Z2*L
-		a = np.sqrt(gamma)*(A-B*L)
+		a = np.sqrt(gamma)*(A-B*L).T
 		
 		P = scipy.linalg.solve_discrete_lyapunov(a, q)
 
@@ -119,7 +119,7 @@ class LQREnv(object):
 		w2 = Z1 + gamma*A.T*P*A
 		w3 = Z2 + gamma*B.T*P*B
 		w4 = 2*gamma*A.T*P*B
-		q_value = -(x.T*w2*x + u.T*w3*u + x.T*w4*u + w4).item()
+		q_value = -(x.T*w2*x + u.T*w3*u + x.T*w4*u + w1).item()
 
 		return q_value
 
