@@ -100,7 +100,7 @@ class LQREnv(object):
 		w3 = (Z2 + gamma*B.T*P*B).item()
 		w4 = (2*gamma*A.T*P*B).item()
 
-		return np.matrix([w1,w2,w3,w4]).reshape(4,1)
+		return np.matrix([-w1,-w2,-w3,-w4]).reshape(4,1)
 
 	def true_Qvalue(self, L, gamma, state, action):
 		x = state
@@ -122,4 +122,19 @@ class LQREnv(object):
 		q_value = -(x.T*w2*x + u.T*w3*u + x.T*w4*u + w1).item()
 
 		return q_value
+
+	def true_Qvalue_state(self, L, gamma, state):
+		x = state
+		Z1 = self.Z1
+		Z2 = self.Z2
+		A = self.A
+		B = self.B
+
+		q = Z1 + L.T*Z2*L
+		a = np.sqrt(gamma)*(A-B*L).T
+		
+		P = scipy.linalg.solve_discrete_lyapunov(a, q)
+
+		q_state = -(x.T*P*x + gamma/(1-gamma)*np.trace(P))
+		return q_state.item()
 

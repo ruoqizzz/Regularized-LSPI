@@ -15,14 +15,14 @@ class GreedyPolicy(object):
 		self.actions = list(range(n_actions))
 		self.weights = np.random.uniform(-1.0, 1.0, size=(self.n_basis_func, 1))
 
-
 	def q_state_action_func(self, state, action):
-        # Q(s, a; w) = sum (pi(s, a) * weights)
-        # # basis functions pi(s, a)
+		# Q(s, a; w) = sum (pi(s, a) * weights)
+		# # basis functions pi(s, a)
 		vector_basis = self.basis_func.evaluate(state,action)
 		return np.dot(vector_basis, self.weights)  # pi(s, a) * weights
 
-	def get_best_action_epsilon(self, state):
+	# epsilon greedy
+	def get_best_action_explore(self, state):
 		q_state_actions = [self.q_state_action_func(state, a) for a in self.actions]
 		q_state_actions = np.reshape(q_state_actions, [len(q_state_actions), 1]) # convert to column vector
 		index = np.argmax(q_state_actions)
@@ -69,8 +69,8 @@ class ExactPolicy4LQR(object):
 
 	def get_best_action(self, state):
 		# [1, s.T*s, s.T*u, u.T*u] 
-		print("state: {}".format(state))
-		print("weights: {}".format(self.weights))
+		# print("state: {}".format(state))
+		# print("weights: {}".format(self.weights))
 		w3 = self.weights.getA()[2][0]
 		w4 = self.weights.getA()[3][0]
 		action = -w4/(2*w3) * state
@@ -80,18 +80,22 @@ class ExactPolicy4LQR(object):
 
 	def get_action_with_L(self, state):
 		# [1, s.T*s, s.T*u, u.T*u] 
-		print("state: {}".format(state))
-		print("weights: {}".format(self.weights))
+		# print("state: {}".format(state))
+		# print("weights: {}".format(self.weights))
 		w3 = self.weights.getA()[2][0]
 		w4 = self.weights.getA()[3][0]
 		action = - self.L * state
-		print("action: {}".format(action))
+		# print("action: {}".format(action))
 		return action
 
-	def get_action_training(self, state):
-		return self.get_action_with_L(state)
+	def get_action_training(self, state, option='with_L'):
+		if option=='with_L':
+			return self.get_action_with_L(state)
+		elif option=='greedy':
+			return self.get_best_action(state)
 
-	def get_best_action_noise(self, state):
+	# action with gaussian noise mean0 noise 1
+	def get_best_action_explore(self, state):
 		u = self.get_best_action(state)
 		m = u.shape[0]
 		# noise is scala or vector? 

@@ -44,7 +44,11 @@ class ExactBasis4LQR(object):
 		phi = np.zeros((n, ))
 		s = state
 		u = action
-		offset_phi = np.array([1, np.asscalar(s.T*s), np.asscalar(u.T*u), np.asscalar(s.T*u)])
+		# print("BasisFunc evaluate: \n")
+		# print("s: {}".format(s))
+		# print("u: {}".format(u))
+
+		offset_phi = np.array([1, (s.T*s).item(), (u.T*u).item(), (s.T*u).item()])
 		# print("in basis evaluate phi_next: {}".format(offset_phi))
 		return offset_phi
 		
