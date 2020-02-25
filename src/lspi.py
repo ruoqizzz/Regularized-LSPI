@@ -25,7 +25,6 @@ class LSPIAgent(object):
 		self.n_basis_func = self.basis_function.size()
 		epsilon = 1-params['exploration']
 		self.policy = params['policy']
-		# print(self.policy.weights)
 		self.lstdq = LSTDQ(self.basis_function, self.gamma)
 		self.n_iter_max = 30
 
@@ -49,7 +48,7 @@ class LSPIAgent(object):
 
 
 	def get_action(self, state):
-		return self.policy.get_best_action_epsilon(state)
+		return self.policy.get_action_iteracting(state)
 		# return self.policy.get_action_LQR(state)
 
 
@@ -66,7 +65,7 @@ class LSTDQ(object):
 		A = np.zeros([n, n])
 		b = np.zeros([n, 1])
 		# l2 weights here:
-		np.fill_diagonal(A, .1)  # Singular matrix error
+		np.fill_diagonal(A, 0.1)  # Singular matrix error
 
 		for s in samples:
 			state = s.state

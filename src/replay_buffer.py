@@ -38,15 +38,20 @@ class ReplayBuffer(object):
 			return random.sample(self.buffer, self.num_buffer)
 
 
-	def sample_with_current(self, batch_size):
+	def sample_with_current(self, batch_size, current_size=0):
+		assert batch_size >= current_size
 		if batch_size < self.num_buffer:
-			rand =  random.sample(self.buffer[:int(self.num_buffer-batch_size/2)], int(batch_size/2))
-			concat = rand + self.buffer[-int(batch_size/2):]
-			# return [-batch_size:] to ensure the number is correct and contains the latest sample
-			return concat[-batch_size:]
-			# return random.sample(self.buffer, batch_size)
+			if current_size==0:
+				return random.sample(self.buffer, batch_size)
+			elif batch_size==current_size:
+				return self.buffer[-current_size:]
+			else: 
+				rand =  random.sample(self.buffer[:int(self.num_buffer-current_size)], int(batch_size-current_size))
+				concat = rand + self.buffer[-current_size:]
+				return concat[-batch_size:]
 		else:
 			return random.sample(self.buffer, self.num_buffer)
+
 
 	def reset(self):
 		self.buffer = []

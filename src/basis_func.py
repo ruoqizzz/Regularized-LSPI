@@ -16,7 +16,7 @@ class RBF(object):
 	def size(self):
 		return self.n_actions*self.n_features
 
-	def __calcu_basis_component(self,state, mean, gamma):
+	def __calcu_basis_component(self, state, mean, gamma):
 		mean_diff = state - mean
 		return np.exp(-gamma*np.sum(mean_diff*mean_diff))
 
@@ -29,6 +29,31 @@ class RBF(object):
 		phi[offset+1:offset+1+len(rbf)] = rbf
 		return phi
 
+
+class RBF_LQR(object):
+	"""docstring for RBF"""
+	def __init__(self, input_dim, n_features, gamma):
+		super(RBF_LQR, self).__init__()
+		self.input_dim = input_dim
+		self.n_features = n_features
+		self.gamma = gamma
+		# the range of mean 
+		self.feature_means = [np.random.uniform(-1, 1, input_dim) for _ in range(self.n_features-1)]
+		# self.feature_means = np.arange(n_features)[1:] * 0.1
+
+	def size(self):
+		return self.n_features
+
+	def __calcu_basis_component(self,state, mean, gamma):
+		mean_diff = state - mean
+		return np.exp(-gamma*np.sum(mean_diff*mean_diff))
+
+	def evaluate(self, state, action):
+		n = self.size()
+		s = state
+		u = action
+		offset_phi = [self.__calcu_basis_component(state, mean, self.gamma) for mean in self.feature_means]
+		return np.array([1] + offset_phi)
 
 class ExactBasis4LQR(object):
 	"""docstring for ExactBasis4LQR"""

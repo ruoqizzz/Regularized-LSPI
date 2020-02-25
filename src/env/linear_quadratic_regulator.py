@@ -7,7 +7,7 @@ import scipy.linalg
 
 class LQREnv(object):
 	"""docstring for LQREnv"""
-	def __init__(self, A=np.matrix(0.3), 
+	def __init__(self, A=np.matrix(0.9), 
 					   B=np.matrix(1.), 
 					   Z1=np.matrix(1.), 
 					   Z2=np.matrix(1.), 
@@ -137,4 +137,20 @@ class LQREnv(object):
 
 		q_state = -(x.T*P*x + gamma/(1-gamma)*np.trace(P))
 		return q_state.item()
+
+	def optimal_policy_L(self, gamma):
+		Z1 = self.Z1
+		Z2 = self.Z2
+		A = self.A
+		B = self.B
+
+		a = np.sqrt(gamma)*A
+		b = np.sqrt(gamma)*B
+		r = Z2
+		q = Z1
+		P = scipy.linalg.solve_discrete_are(a,b,q,r)
+
+		L = gamma* (1/(gamma*B.T*P*B+Z2))*B.T*P*A
+		return L
+		
 

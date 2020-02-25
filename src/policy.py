@@ -14,6 +14,7 @@ class GreedyPolicy(object):
 		self.n_actions = n_actions
 		self.actions = list(range(n_actions))
 		self.weights = np.random.uniform(-1.0, 1.0, size=(self.n_basis_func, 1))
+		self.get_action_iteracting = self.get_best_action_epsilon
 
 	def q_state_action_func(self, state, action):
 		# Q(s, a; w) = sum (pi(s, a) * weights)
@@ -22,7 +23,7 @@ class GreedyPolicy(object):
 		return np.dot(vector_basis, self.weights)  # pi(s, a) * weights
 
 	# epsilon greedy
-	def get_best_action_explore(self, state):
+	def get_best_action_epsilon(self, state):
 		q_state_actions = [self.q_state_action_func(state, a) for a in self.actions]
 		q_state_actions = np.reshape(q_state_actions, [len(q_state_actions), 1]) # convert to column vector
 		index = np.argmax(q_state_actions)
@@ -54,18 +55,27 @@ class GreedyPolicy(object):
 
 class ExactPolicy4LQR(object):
 	"""docstring for ExactPolicy4LQR"""
-	def __init__(self, basis_func, L=np.matrix(0.3), epsilon=0.1):
+	def __init__(self, basis_func, L=None):
 		super(ExactPolicy4LQR, self).__init__()
-		self.L = L
-		self.epsilon = epsilon
+		if L==None:
+			self.get_action_training = self.get_best_action
+		else:
+			self.L = L
+			self.get_action_training = self.get_action_with_L
 		self.basis_func = basis_func
 		n = basis_func.size()
 		self.weights = mb.rand(n,1)
+		# use the best L 
+		self.get_action_iteracting = self.get_best_action
 
 	def q_state_action_func(self, state, action):
 		basis = self.basis_func.evaluate(state,action)
 		return basis.T * self.weights
 
+	def estimate_policy_L(self):
+		w3 = self.weights.getA()[2][0]
+		w4 = self.weights.getA()[3][0]
+		return np.matrix(w4/(2*w3))
 
 	def get_best_action(self, state):
 		# [1, s.T*s, s.T*u, u.T*u] 
@@ -74,8 +84,9 @@ class ExactPolicy4LQR(object):
 		w3 = self.weights.getA()[2][0]
 		w4 = self.weights.getA()[3][0]
 		action = -w4/(2*w3) * state
+		# print("L :{}".format(w4/(2*w3)))
 		# action = - 0.1 * state
-		print("action: {}".format(action))
+		# print("action: {}".format(action))
 		return action
 
 	def get_action_with_L(self, state):
@@ -88,14 +99,8 @@ class ExactPolicy4LQR(object):
 		# print("action: {}".format(action))
 		return action
 
-	def get_action_training(self, state, option='with_L'):
-		if option=='with_L':
-			return self.get_action_with_L(state)
-		elif option=='greedy':
-			return self.get_best_action(state)
-
 	# action with gaussian noise mean0 noise 1
-	def get_best_action_explore(self, state):
+	def get_best_action_noise(self, state):
 		u = self.get_best_action(state)
 		m = u.shape[0]
 		# noise is scala or vector? 

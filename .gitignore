@@ -17,6 +17,7 @@ resources/
 
 
 # images
+Src/images/*
 *.png
 *.jpg
 
@@ -25,3 +26,6 @@ resources/
 
 # debug file
 debug*
+
+# samples
+src/samples/*
