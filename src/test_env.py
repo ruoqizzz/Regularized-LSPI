@@ -4,8 +4,10 @@
 '''
 from env.inverted_pendulum import InvertedPendulumEnv
 from env.chain import ChainEnv
+from env.linear_quadratic_regulator import LQREnv
 import gym
 import time
+import numpy as np 
 
 def test_inverted_pendulum():
 	env = InvertedPendulumEnv()
@@ -39,7 +41,19 @@ def test_chain():
 			break
 	env.close()
 
+def test_AwithOptimalL():
+	A_values= list(np.arange(0.1,1.0, 0.1))
+	L = []
+	for a in A_values:
+		env = LQREnv(A=np.matrix(a))
+		L.append(env.optimal_policy_L(0.99).item())
+	import matplotlib.pyplot as plt
+	plt.plot(A_values, L)
+	plt.xlabel('value A')
+	plt.ylabel('optimal L')
+	plt.show()
 
 if __name__ == '__main__':
-	test_inverted_pendulum()
-	test_chain()
+	# test_inverted_pendulum()
+	# test_chain()
+	test_AwithOptimalL()
