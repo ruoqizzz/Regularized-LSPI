@@ -20,8 +20,13 @@ import pickle
 
 # sample data files name for LQR
 LQR_samples_filename = {
-	2000: "samples/LQR/gaussian_actions_2000.pickle",
-	5000: "samples/LQR/gaussian_actions_5000.pickle"
+	2000: "samples/LQR/gaussian_actions_2000_2.pickle",
+	5000: "samples/LQR/gaussian_actions_5000.pickle",
+	10000: "samples/LQR/gaussian_actions_10000.pickle",
+	20000: "samples/LQR/gaussian_actions_20000.pickle",
+	"-22-100": "samples/LQR/states[-2,2]_100_L=0.1.pickle",
+	"-22-1000": "samples/LQR/states[-2,2]_1000_L=0.1.pickle",
+	"-22-10000": "samples/LQR/states[-2,2]_10000_L=0.1.pickle"
 }
 
 
@@ -33,7 +38,7 @@ def main():
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
 	parser.add_argument('--basis_function_dim', default=200, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
-	parser.add_argument('--sample_max_steps', default=2000, choices=[2000,5000])
+	parser.add_argument('--sample_max_steps', default=10000, choices=[2000,5000])
 	parser.add_argument('--max_steps', default=500, type=int)
 	# parser.add_argument('--batch_size', default=2000, type=int)
 	parser.add_argument('--L', default=0.1, type=float)	# 0.0 means no random action
@@ -59,11 +64,13 @@ def main():
 	max_steps = params['max_steps']
 
 	agent = LSPIAgent(params)
-	sample_filename = LQR_samples_filename[params['sample_max_steps']]
+	# sample_filename = LQR_samples_filename[params['sample_max_steps']]
+	sample_filename = LQR_samples_filename["-22-10000"]
 	f = open(sample_filename, 'rb')
 	replay_buffer = pickle.load(f)
 
 	sample = replay_buffer.sample(batch_size)
+	print("length of sample: {}".format(len(sample)))
 	error_list, new_weights = agent.train(sample)
 
 	# logging
@@ -152,7 +159,7 @@ def main():
 	# plt.show()
 
 
-	plt.savefig("images/rbf-lqr/L2/20-"+str(n_features)+"-"+now+"q_true&estimate-state(-2,2)")
+	# plt.savefig("images/rbf-lqr/L2/20-"+str(n_features)+"-"+now+"q_true&estimate-state(-2,2)")
 	plt.show()
 
 	env.close()

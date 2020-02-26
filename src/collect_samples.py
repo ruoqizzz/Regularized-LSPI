@@ -65,19 +65,19 @@ def collect_samples_sa(env, states,L):
 if __name__ == '__main__':
 	# collect samples for 2000 steps
 	env = LQREnv()
-	sample_step_list = [10000, 20000]
-	for steps in sample_step_list:
-		replay_buffer = collect_samples_gaussian(env, steps)
-		f1 = open("samples/LQR/gaussian_actions_"+str(steps)+".pickle", 'wb')
-		pickle.dump(replay_buffer, f1)
-		f1.close()
+	# sample_step_list = [10000, 20000]
+	# for steps in sample_step_list:
+	# 	replay_buffer = collect_samples_gaussian(env, steps)
+	# 	f1 = open("samples/LQR/gaussian_actions_"+str(steps)+".pickle", 'wb')
+	# 	pickle.dump(replay_buffer, f1)
+	# 	f1.close()
 
-	# states = np.linspace(-2.0, 2.0, 100)
-	# L = np.matrix(0.1)
-	# replay_buffer = collect_samples_sa(env, states, L)
-	# f1 = open("samples/LQR/states[-2,2]_L=0.1.pickle", 'wb')
-	# pickle.dump(replay_buffer, f1)
-	# f1.close()
+	states = np.linspace(-2.0, 2.0, 10000)
+	L = np.matrix(0.1)
+	replay_buffer = collect_samples_sa(env, states, L)
+	f1 = open("samples/LQR/states[-2,2]_10000_L=0.1.pickle", 'wb')
+	pickle.dump(replay_buffer, f1)
+	f1.close()
 
 
 

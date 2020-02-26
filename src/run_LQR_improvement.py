@@ -16,8 +16,11 @@ import time
 
 # sample data files name for LQR
 LQR_samples_filename = {
-	2000: "samples/LQR/gaussian_actions_2000.pickle",
-	5000: "samples/LQR/gaussian_actions_5000.pickle"
+	2000: "samples/LQR/gaussian_actions_2000_2.pickle",
+	5000: "samples/LQR/gaussian_actions_5000.pickle",
+	10000: "samples/LQR/gaussian_actions_10000.pickle",
+	20000: "samples/LQR/gaussian_actions_20000.pickle",
+	-22: "samples/LQR/states[-2,2]_L=0.1.pickle"
 }
 
 def main():
