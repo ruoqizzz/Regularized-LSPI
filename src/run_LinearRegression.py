@@ -22,8 +22,11 @@ LQR_samples_filename = {
 	5000: "samples/LQR/gaussian_actions_5000.pickle",
 	10000: "samples/LQR/gaussian_actions_10000.pickle",
 	20000: "samples/LQR/gaussian_actions_20000.pickle",
-	-22: "samples/LQR/states[-2,2]_L=0.1.pickle"
+	"-22-100": "samples/LQR/states[-2,2]_100_L=0.1.pickle",
+	"-22-1000": "samples/LQR/states[-2,2]_1000_L=0.1.pickle",
+	"-22-10000": "samples/LQR/states[-2,2]_10000_L=0.1.pickle"
 }
+
 
 def main():
 	parser = argparse.ArgumentParser()

@@ -20,8 +20,11 @@ LQR_samples_filename = {
 	5000: "samples/LQR/gaussian_actions_5000.pickle",
 	10000: "samples/LQR/gaussian_actions_10000.pickle",
 	20000: "samples/LQR/gaussian_actions_20000.pickle",
-	-22: "samples/LQR/states[-2,2]_L=0.1.pickle"
+	"-22-100": "samples/LQR/states[-2,2]_100_L=0.1.pickle",
+	"-22-1000": "samples/LQR/states[-2,2]_1000_L=0.1.pickle",
+	"-22-10000": "samples/LQR/states[-2,2]_10000_L=0.1.pickle"
 }
+
 
 def main():
 	parser = argparse.ArgumentParser()
@@ -31,7 +34,7 @@ def main():
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
 	parser.add_argument('--basis_function_dim', default=10, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
-	parser.add_argument('--sample_max_steps', default=2000, type=int)
+	parser.add_argument('--sample_max_steps', default="5000", choices=["2000","5000","10000","20000"])
 	parser.add_argument('--max_steps', default=500, type=int)
 	parser.add_argument('--batch_size', default=2000, type=int)
 	parser.add_argument('--update_freq', default=10000000, type=int)
@@ -44,7 +47,7 @@ def main():
 	params['n_actions'] = env.action_space.shape[0]
 	params['state_dim'] = env.observation_space.shape[0]
 	params['basis_func'] = ExactBasis4LQR()
-
+	params['sample_max_steps'] = int(params['sample_max_steps'])
 	gamma = params['weight_discount']
 	# Note: now init policy with specific L
 	#		the action would be related to this init L

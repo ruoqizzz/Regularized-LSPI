@@ -7,6 +7,7 @@ import numpy as np
 import scipy
 from scipy import linalg
 import time
+from sklearn import linear_model
 
 Transition = namedtuple('Transition',
 						('state', 'action','reward', 'next_state', 'done'))
@@ -28,12 +29,12 @@ class LSPIAgent(object):
 		self.lstdq = LSTDQ(self.basis_function, self.gamma)
 		self.n_iter_max = 30
 
-	def train(self, sample):
+	def train(self, sample, opt='r1'):
 		error = float('inf')
 		error_his = []
 		i_iter = 0
 		while error > self.stop_criterion and i_iter<self.n_iter_max:
-			new_weights = self.lstdq.training(sample, self.policy)
+			new_weights = self.lstdq.training(sample, self.policy, opt)
 			# print(new_weights)
 			error = np.linalg.norm((new_weights - self.policy.weights))
 			# print("error when update_weights in iteration {}: {}".format(i_iter,error))
@@ -59,7 +60,7 @@ class LSTDQ(object):
 		self.basis_function = basis_function
 		self.gamma = gamma
 
-	def training(self, samples, policy):
+	def training(self, samples, policy, opt):
 		# Figure 5 in paper
 		n = self.basis_function.size()
 		A = np.zeros([n, n])
@@ -78,27 +79,6 @@ class LSTDQ(object):
 			# print("reward: {}".format(reward))
 			# print("next_state: {}".format(next_state))
 			# print("done: {}".format(done))
-		# 	phi_sa = (policy.basis_func.evaluate(state, action)
-		# 			  .reshape((-1, 1)))
-
-		# 	if not done:
-		# 		best_action = policy.get_best_action(next_state)
-		# 		phi_sprime = (policy.basis_func
-		# 					  .evaluate(next_state, best_action)
-		# 					  .reshape((-1, 1)))
-		# 	else:
-		# 		phi_sprime = np.zeros((n, 1))
-
-		# 	A += phi_sa.dot((phi_sa - self.gamma*phi_sprime).T)
-		# 	b += phi_sa*reward
-
-		# a_rank = np.linalg.matrix_rank(A)
-		# if a_rank == n:
-		# 	w = linalg.solve(A, b)
-		# else:
-		# 	logging.warning('A matrix is not full rank. %d < %d', a_rank, n)
-		# 	w = linalg.lstsq(A, b)[0]
-		# return w.reshape((-1, ))
 
 			phi = self.basis_function.evaluate(state, action)
 			if not done:
@@ -117,8 +97,42 @@ class LSTDQ(object):
 			# print("A: {}".format(A))
 			A += np.dot(phi, loss)
 			b += phi * reward
-		# print("A: {}".format(A))
-		# print("b: {}".format(b))
-		inv_A = np.linalg.inv(A)
-		w = np.dot(inv_A, b)
-		return w
+
+		if opt=='r2':
+			# \beta of regularization l2 depends on initA
+			
+			# print("A: {}".format(A))
+			# print("b: {}".format(b))
+			inv_A = np.linalg.inv(A)
+			w = np.dot(inv_A, b)
+			print("w: {}".format(w))
+			return w
+		elif opt=='r1':
+			# useing sklearn to solve this
+			# importance of regularization l1 is 
+			# the alpha in sklearn.linear_model.lasso()
+			# if alpha = 0.0, then would be linear regression
+			clf = linear_model.Lasso(alpha=1.0,max_iter=10000,tol=0.0001)
+			clf.fit(A, b)
+			# print("clf.coef_: {}".format(clf.coef_))
+			return np.matrix(clf.coef_).reshape(len(clf.coef_),1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
