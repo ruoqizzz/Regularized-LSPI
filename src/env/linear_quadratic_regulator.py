@@ -53,6 +53,8 @@ class LQREnv(object):
 	def calcu_reward(self, u):
 		x = self.state
 		# cost matrix size 1x1
+		# u = np.matrix(u)
+		
 		cost = x.T*self.Z1*x + u.T*self.Z2*u
 		return -float(cost)
 

@@ -43,7 +43,11 @@ def main():
 	params['basis_func'] = ExactBasis4LQR()
 
 	gamma = params['weight_discount']
-	params['policy'] = ExactPolicy4LQR(params['basis_func'])
+	# Note: now init policy with specific L
+	#		the action would be related to this init L
+	#		Remember to update L!
+	L=np.matrix(params['L'])
+	params['policy'] = ExactPolicy4LQR(params['basis_func'],L)
 
 	# set the parameters for agent
 	batch_size = params['batch_size']
@@ -87,8 +91,14 @@ def main():
 				reward_his.append(accu_reward)
 				time.sleep(0.1)
 				break
-		estimateL = agent.policy.estimate_policy_L().item()
-		estimateL_his.append(estimateL)
+		# estimateL = agent.policy.estimate_policy_L().item()
+		# use true Q/weights in this L to check whether it converge to optimal one 
+		true_weights = env.true_weights(agent.policy.L, gamma)
+		w3 = true_weights[2].item()
+		w4 = true_weights[3].item()
+		estimateL = np.matrix(w4/(2*w3))
+		estimateL_his.append(estimateL.item())
+		agent.policy.L = estimateL
 		print("estimateL: {}".format(estimateL))
 		agent.train(sample)
 			

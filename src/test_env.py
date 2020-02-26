@@ -48,6 +48,7 @@ def test_AwithOptimalL():
 		env = LQREnv(A=np.matrix(a))
 		L.append(env.optimal_policy_L(0.99).item())
 	import matplotlib.pyplot as plt
+	print('L: {}'.format(L))
 	plt.plot(A_values, L)
 	plt.xlabel('value A')
 	plt.ylabel('optimal L')
