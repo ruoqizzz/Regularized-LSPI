@@ -36,23 +36,31 @@ class RBF_LQR(object):
 		super(RBF_LQR, self).__init__()
 		self.input_dim = input_dim
 		self.n_features = n_features
+		# TODO gamma -> width
+		# keep not so big
+		# RANDOM give a range
 		self.gamma = gamma
 		# the range of mean 
-		self.feature_means = [np.random.uniform(-1, 1, input_dim) for _ in range(self.n_features-1)]
+		self.feature_means = [np.random.uniform([-10,-1],[10,1], (3,2)).transpose((1,0)) for _ in range(self.n_features-1)]
+		# TODO: -2,2 10 
+		# TODO: -10,10 10
+		# self.feature_means = [np.arange(-2,2,4/(self.n_features-1))]*input_dim
 		# self.feature_means = np.arange(n_features)[1:] * 0.1
 
 	def size(self):
 		return self.n_features
 
-	def __calcu_basis_component(self,state, mean, gamma):
-		mean_diff = state - mean
+	def __calcu_basis_component(self,state, action, mean, gamma):
+		state = np.array(state).reshape(1,self.input_dim)
+		action = np.array(action).reshape(1,self.input_dim)
+		mean_diff = [state,action] - mean
 		return np.exp(-gamma*np.sum(mean_diff*mean_diff))
 
 	def evaluate(self, state, action):
 		n = self.size()
 		s = state
 		u = action
-		offset_phi = [self.__calcu_basis_component(state, mean, self.gamma) for mean in self.feature_means]
+		offset_phi = [self.__calcu_basis_component(state, action, mean, self.gamma) for mean in self.feature_means]
 		return np.array([1] + offset_phi)
 
 class ExactBasis4LQR(object):
