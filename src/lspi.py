@@ -29,7 +29,7 @@ class LSPIAgent(object):
 		self.lstdq = LSTDQ(self.basis_function, self.gamma)
 		self.n_iter_max = 30
 
-	def train(self, sample, opt='r1'):
+	def train(self, sample, opt='l1'):
 		error = float('inf')
 		error_his = []
 		i_iter = 0
@@ -66,7 +66,7 @@ class LSTDQ(object):
 		A = np.zeros([n, n])
 		b = np.zeros([n, 1])
 		# l2 weights here:
-		np.fill_diagonal(A, 0.1)  # Singular matrix error
+		np.fill_diagonal(A, .01)  # Singular matrix error
 
 		for s in samples:
 			state = s.state
@@ -98,7 +98,7 @@ class LSTDQ(object):
 			A += np.dot(phi, loss)
 			b += phi * reward
 
-		if opt=='r2':
+		if opt=='l2':
 			# \beta of regularization l2 depends on initA
 			
 			# print("A: {}".format(A))
@@ -107,15 +107,16 @@ class LSTDQ(object):
 			w = np.dot(inv_A, b)
 			print("w: {}".format(w))
 			return w
-		elif opt=='r1':
+		elif opt=='l1':
 			# useing sklearn to solve this
 			# importance of regularization l1 is 
 			# the alpha in sklearn.linear_model.lasso()
 			# if alpha = 0.0, then would be linear regression
 			clf = linear_model.Lasso(alpha=1.0,max_iter=10000,tol=0.0001)
 			clf.fit(A, b)
-			# print("clf.coef_: {}".format(clf.coef_))
-			return np.matrix(clf.coef_).reshape(len(clf.coef_),1)
+			w = np.matrix(clf.coef_).reshape(len(clf.coef_),1)
+			print("w: {}".format(w))
+			return w
 
 
 

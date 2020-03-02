@@ -41,7 +41,7 @@ class RBF_LQR(object):
 		# RANDOM give a range
 		self.gamma = gamma
 		# the range of mean 
-		self.feature_means = [np.random.uniform([-10,-1],[10,1], (3,2)).transpose((1,0)) for _ in range(self.n_features-1)]
+		self.feature_means = [np.random.uniform([-10,-5],[10,5], (3,2)).transpose((1,0)) for _ in range(self.n_features-1)]
 		# TODO: -2,2 10 
 		# TODO: -10,10 10
 		# self.feature_means = [np.arange(-2,2,4/(self.n_features-1))]*input_dim

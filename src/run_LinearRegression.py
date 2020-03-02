@@ -27,15 +27,14 @@ LQR_samples_filename = {
 	"-22-10000": "samples/LQR/states[-2,2]_10000_L=0.1.pickle"
 }
 
-
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--env_name', default="LQR", choices=["cliff-v0","CartPole-v0","inverted_pedulum","LQR","chain"])	# gym env to train
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
-	parser.add_argument('--basis_function_dim', default=10, type=int)
+	parser.add_argument('--basis_function_dim', default=30, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
-	parser.add_argument('--sample_max_steps', default="5000", choices=["2000","5000","10000","20000"])
+	parser.add_argument('--sample_max_steps', default="2000", choices=["2000","5000","10000","20000"])
 	parser.add_argument('--max_steps', default=500, type=int)
 	# parser.add_argument('--batch_size', default=2000, type=int)
 	parser.add_argument('--L', default=0.1, type=float)	# 0.0 means no random action
@@ -48,9 +47,10 @@ def main():
 	params['sample_max_steps'] = int(params['sample_max_steps'])
 	# print(params['state_dim'])
 	# params['basis_func'] = ExactBasis4LQR()
+	# basis_function = ExactBasis4LQR()
 	n_features = params['basis_function_dim']
 	gamma = params['weight_discount']
-	basis_function = RBF_LQR(params['state_dim'], n_features, gamma)
+	basis_function = RBF_LQR(params['state_dim'], n_features, 0.001)
 
 	# esitimate specific L
 	L=np.matrix(params['L'])
@@ -91,13 +91,15 @@ def main():
 
 	phi_list = np.array(phi_list)
 	# print("phi_list shape: {}".format(phi_list.shape))
+	print("phi_list: {}".format(phi_list[:10]))
 	qTrue_list = np.array(qTrue_list)
+	print("qTrue_list: {}".format(qTrue_list[:10]))
 	# print("qTrue_list shape: {}".format(qTrue_list.shape))
 	reg = LinearRegression().fit(phi_list, qTrue_list)
 	# print("reg.get_params(): {}".format(reg.get_params()))
 
 	# for state range
-	states = np.linspace(-2.0, 2.0, 100)
+	states = np.linspace(-10.0, 10.0, 100)
 	actions = []
 	true_weights_his = []
 	true_estimate_error_history = []

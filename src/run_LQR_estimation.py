@@ -36,7 +36,7 @@ def main():
 	parser.add_argument('--env_name', default="LQR", choices=["cliff-v0","CartPole-v0","inverted_pedulum","LQR","chain"])	# gym env to train
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
-	parser.add_argument('--basis_function_dim', default=500, type=int)
+	parser.add_argument('--basis_function_dim', default=1000, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
 	parser.add_argument('--sample_max_steps', default="2000", choices=["2000","5000","10000","20000"])
 	parser.add_argument('--max_steps', default=500, type=int)
@@ -53,7 +53,7 @@ def main():
 	# params['basis_func'] = ExactBasis4LQR()
 	n_features = params['basis_function_dim']
 	gamma = params['weight_discount']
-	params['basis_func'] = RBF_LQR(params['state_dim'], n_features, gamma)
+	params['basis_func'] = RBF_LQR(params['state_dim'], n_features, 0.001)
 
 	# esitimate specific L
 	L=np.matrix(params['L'])
@@ -65,8 +65,8 @@ def main():
 	max_steps = params['max_steps']
 
 	agent = LSPIAgent(params)
-	# sample_filename = LQR_samples_filename[params['sample_max_steps']]
-	sample_filename = LQR_samples_filename["-22-10000"]
+	sample_filename = LQR_samples_filename[params['sample_max_steps']]
+	# sample_filename = LQR_samples_filename["-22-10000"]
 	f = open(sample_filename, 'rb')
 	replay_buffer = pickle.load(f)
 
@@ -83,41 +83,41 @@ def main():
 
 	# for specific state
 	# range of action
-	# state = np.matrix(-1.)
-	# actions = np.linspace(-1,1, 100)
+	state = np.matrix(-1.)
+	actions = np.linspace(-1,1, 100)
 
-	# for i in range(len(actions)):
-	# 	action = np.matrix(actions[i])
-	# 	q_estimate = (agent.policy.q_state_action_func(state, action)).item()
-	# 	# print("q_estimate: {}".format(q_estimate))
-	# 	q_true = env.true_Qvalue(L, gamma, state, action)
-	# 	# print("q_true: {}".format(q_true))
-	# 	q_estimate_his.append(q_estimate)
-	# 	q_true_his.append(q_true)
+	for i in range(len(actions)):
+		action = np.matrix(actions[i])
+		q_estimate = (agent.policy.q_state_action_func(state, action)).item()
+		# print("q_estimate: {}".format(q_estimate))
+		q_true = env.true_Qvalue(L, gamma, state, action)
+		# print("q_true: {}".format(q_true))
+		q_estimate_his.append(q_estimate)
+		q_true_his.append(q_true)
 
-	# true_weights = env.true_weights(L, gamma)
-	# print("true_weights: {}".format(true_weights))
-	# estimate_weights = agent.policy.weights
-	# print("estimate_weights: {}".format(estimate_weights))
+	true_weights = env.true_weights(L, gamma)
+	print("true_weights: {}".format(true_weights))
+	estimate_weights = agent.policy.weights
+	print("estimate_weights: {}".format(estimate_weights))
 	# true_estimate_error = np.linalg.norm(true_weights-estimate_weights)
 	# print("true_estimate_error: {}".format(true_estimate_error))
 
-	# now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
+	now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
 
-	# plt.figure(figsize=(8, 6))
-	# plt.subplot(211)
-	# plt.plot(actions, q_estimate_his)
-	# plt.title('q estimate')
+	plt.figure(figsize=(8, 6))
+	plt.subplot(211)
+	plt.plot(actions, q_estimate_his)
+	plt.title('q estimate')
 
-	# plt.subplot(212)
-	# plt.plot(actions, q_true_his)
-	# plt.title('q true')
+	plt.subplot(212)
+	plt.plot(actions, q_true_his)
+	plt.title('q true')
 	# plt.savefig("images/rbf-lqr/"+str(n_features)+"-"+now+"q_true&estimate-action(-1,1)")
-	# plt.show()
+	plt.show()
 
 
 	# for state range
-	states = np.linspace(-2.0, 2.0, 100)
+	states = np.linspace(-10.0, 10.0, 100)
 	actions = []
 	true_weights_his = []
 	true_estimate_error_history = []
