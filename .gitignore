@@ -24,6 +24,9 @@ Src/images/*
 # output log
 *.txt
 
+# data saving
+src/data
+
 # debug file
 debug*
 

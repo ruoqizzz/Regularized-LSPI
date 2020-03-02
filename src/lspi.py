@@ -28,13 +28,15 @@ class LSPIAgent(object):
 		self.policy = params['policy']
 		self.lstdq = LSTDQ(self.basis_function, self.gamma)
 		self.n_iter_max = 30
+		self.opt = params['reg_opt']
+		self.reg_param = params['reg_param']
 
-	def train(self, sample, opt='l1'):
+	def train(self, sample):
 		error = float('inf')
 		error_his = []
 		i_iter = 0
 		while error > self.stop_criterion and i_iter<self.n_iter_max:
-			new_weights = self.lstdq.training(sample, self.policy, opt)
+			new_weights = self.lstdq.training(sample, self.policy, self.opt, self.reg_param)
 			# print(new_weights)
 			error = np.linalg.norm((new_weights - self.policy.weights))
 			# print("error when update_weights in iteration {}: {}".format(i_iter,error))
@@ -60,13 +62,16 @@ class LSTDQ(object):
 		self.basis_function = basis_function
 		self.gamma = gamma
 
-	def training(self, samples, policy, opt):
+	def training(self, samples, policy, opt, reg_param):
 		# Figure 5 in paper
 		n = self.basis_function.size()
 		A = np.zeros([n, n])
 		b = np.zeros([n, 1])
 		# l2 weights here:
-		np.fill_diagonal(A, .01)  # Singular matrix error
+		if opt=='l2':
+			np.fill_diagonal(A, reg_param)  # Singular matrix error
+		else:
+			np.fill_diagonal(A, 0.01)
 
 		for s in samples:
 			state = s.state
@@ -112,7 +117,7 @@ class LSTDQ(object):
 			# importance of regularization l1 is 
 			# the alpha in sklearn.linear_model.lasso()
 			# if alpha = 0.0, then would be linear regression
-			clf = linear_model.Lasso(alpha=1.0,max_iter=10000,tol=0.0001)
+			clf = linear_model.Lasso(alpha=reg_param, max_iter=10000,tol=0.0001)
 			clf.fit(A, b)
 			w = np.matrix(clf.coef_).reshape(len(clf.coef_),1)
 			print("w: {}".format(w))

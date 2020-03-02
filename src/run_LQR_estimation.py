@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 import pickle
+import os
 
 # sample data files name for LQR
 LQR_samples_filename = {
@@ -36,24 +37,32 @@ def main():
 	parser.add_argument('--env_name', default="LQR", choices=["cliff-v0","CartPole-v0","inverted_pedulum","LQR","chain"])	# gym env to train
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
-	parser.add_argument('--basis_function_dim', default=1000, type=int)
+	parser.add_argument('--basis_function_dim', default=100, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
 	parser.add_argument('--sample_max_steps', default="2000", choices=["2000","5000","10000","20000"])
 	parser.add_argument('--max_steps', default=500, type=int)
+	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2"])
+	parser.add_argument('--reg_param', default=0.01, type=float)
+	parser.add_argument('--rbf_sigma', default=0.001, type=float)
 	# parser.add_argument('--batch_size', default=2000, type=int)
 	parser.add_argument('--L', default=0.1, type=float)	# 0.0 means no random action
+	
+
 	args = parser.parse_args()
 	params = vars(args)
 
+	# env 
 	env = LQREnv()
 	params['n_actions'] = env.action_space.shape[0]
 	params['state_dim'] = env.observation_space.shape[0]
 	params['sample_max_steps'] = int(params['sample_max_steps'])
 	# print(params['state_dim'])
-	# params['basis_func'] = ExactBasis4LQR()
+	
+	# basis function
 	n_features = params['basis_function_dim']
 	gamma = params['weight_discount']
-	params['basis_func'] = RBF_LQR(params['state_dim'], n_features, 0.001)
+	# params['basis_func'] = ExactBasis4LQR()
+	params['basis_func'] = RBF_LQR(params['state_dim'], n_features, params['rbf_sigma'])
 
 	# esitimate specific L
 	L=np.matrix(params['L'])
@@ -104,6 +113,30 @@ def main():
 
 	now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
 
+	# save data to file
+	# note .item() only for one element
+	dirname = "data/Estimation/state=" + str(state.item())+"/"
+	try:
+		os.mkdir(dirname)
+	except OSError as error:  
+		print(error)
+
+	# # save q_true
+	# filename = dirname + "q_true.pickle"
+	# f = open(filename, 'wb')
+	# pickle.dump(q_true_his, f)
+	# f.close()
+	# save q_estimate
+
+	if params['basis_func'].name()[:3] == 'RBF':
+		filename = dirname + params['basis_func'].name()+"-"+str(params['basis_function_dim'])+"-"+params['reg_opt']+"-"+str(params['reg_param'])+".pickle"
+	else:
+		filename = dirname + params['basis_func'].name()+".pickle"
+	f1 = open(filename, 'wb')
+	pickle.dump(q_estimate_his, f1)
+	f1.close()
+
+
 	plt.figure(figsize=(8, 6))
 	plt.subplot(211)
 	plt.plot(actions, q_estimate_his)
@@ -117,7 +150,9 @@ def main():
 
 
 	# for state range
-	states = np.linspace(-10.0, 10.0, 100)
+	state_low = -10.0
+	state_high = 10.0
+	states = np.linspace(state_low, state_high, 100)
 	actions = []
 	true_weights_his = []
 	true_estimate_error_history = []
@@ -135,7 +170,30 @@ def main():
 		q_estimate_his.append(q_estimate)
 		q_true_his.append(q_true)
 
+
 	now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
+
+	# save estimate data to file
+	dirname = "data/Estimation/states[" + str(state_low)+","+str(state_high)+"]/"
+	try:  
+		os.mkdir(dirname)
+	except OSError as error:
+		print(error)  
+	# # q_true
+	# filename = dirname + "q_true.pickle"
+	# f = open(filename, 'wb')
+	# pickle.dump(q_true_his, f)
+	# f.close()
+
+	# estimate
+	if params['basis_func'].name()[:3]=='RBF':
+		filename = dirname + params['basis_func'].name()+"-"+str(params['basis_function_dim'])+"-"+params['reg_opt']+"-"+str(params['reg_param'])+".pickle"
+	else:
+		filename = dirname + params['basis_func'].name()+".pickle"
+	f1 = open(filename, 'wb')
+	pickle.dump(q_estimate_his, f1)
+	f1.close()
+
 	# plot
 	plt.figure(figsize=(10, 10))
 	plt.title('state from -2 to 2 and action(-L*state)')

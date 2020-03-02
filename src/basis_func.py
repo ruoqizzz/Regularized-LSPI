@@ -29,6 +29,9 @@ class RBF(object):
 		phi[offset+1:offset+1+len(rbf)] = rbf
 		return phi
 
+	def name(self):
+		return "RBF"
+
 
 class RBF_LQR(object):
 	"""docstring for RBF"""
@@ -63,6 +66,9 @@ class RBF_LQR(object):
 		offset_phi = [self.__calcu_basis_component(state, action, mean, self.gamma) for mean in self.feature_means]
 		return np.array([1] + offset_phi)
 
+	def name(self):
+		return "RBF_LQR"
+
 class ExactBasis4LQR(object):
 	"""docstring for ExactBasis4LQR"""
 	def __init__(self):
@@ -84,7 +90,10 @@ class ExactBasis4LQR(object):
 		offset_phi = np.array([1, (s.T*s).item(), (u.T*u).item(), (s.T*u).item()])
 		# print("in basis evaluate phi_next: {}".format(offset_phi))
 		return offset_phi
-		
+	
+	def name(self):
+		return "ExactBasis_LQR"
+
 
 class Polinomial4DiscreteState(object):
 	"""docstring for Polinomial4DiscreteState"""

@@ -38,6 +38,8 @@ def main():
 	parser.add_argument('--max_steps', default=500, type=int)
 	# parser.add_argument('--batch_size', default=2000, type=int)
 	parser.add_argument('--L', default=0.1, type=float)	# 0.0 means no random action
+	parser.add_argument('--reg_opt', default="l1", choices=["l1","l2"])
+	parser.add_argument('--reg_param', default=0.01, type=float)
 	args = parser.parse_args()
 	params = vars(args)
 
