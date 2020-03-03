@@ -15,6 +15,7 @@ import numpy as np
 import time
 import pickle
 from sklearn.linear_model import LinearRegression
+import os
 
 # sample data files name for LQR
 LQR_samples_filename = {
@@ -38,7 +39,7 @@ def main():
 	parser.add_argument('--max_steps', default=500, type=int)
 	# parser.add_argument('--batch_size', default=2000, type=int)
 	parser.add_argument('--L', default=0.1, type=float)	# 0.0 means no random action
-	parser.add_argument('--reg_opt', default="l1", choices=["l1","l2"])
+	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2"])
 	parser.add_argument('--reg_param', default=0.01, type=float)
 	args = parser.parse_args()
 	params = vars(args)
@@ -53,6 +54,7 @@ def main():
 	n_features = params['basis_function_dim']
 	gamma = params['weight_discount']
 	basis_function = RBF_LQR(params['state_dim'], n_features, 0.001)
+	params['basis_func'] = basis_function
 
 	# esitimate specific L
 	L=np.matrix(params['L'])
@@ -101,7 +103,9 @@ def main():
 	# print("reg.get_params(): {}".format(reg.get_params()))
 
 	# for state range
-	states = np.linspace(-10.0, 10.0, 100)
+	state_low = -10.0
+	state_high = 10.0
+	states = np.linspace(state_low, state_high, 100)
 	actions = []
 	true_weights_his = []
 	true_estimate_error_history = []
@@ -120,6 +124,28 @@ def main():
 		q_true_his.append(q_true)
 
 	now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
+
+	# save estimate data to file
+	dirname = "data/Regression/states[" + str(state_low)+","+str(state_high)+"]/"
+	try:  
+		os.mkdir(dirname)
+	except OSError as error:
+		print(error)  
+	# # q_true
+	filename = dirname + "q_true.pickle"
+	f = open(filename, 'wb')
+	pickle.dump(q_true_his, f)
+	f.close()
+
+	# estimate
+	if params['basis_func'].name()[:3]=='RBF':
+		filename = dirname + params['basis_func'].name()+"-"+str(params['basis_function_dim'])+"-"+params['reg_opt']+"-"+str(params['reg_param'])+".pickle"
+	else:
+		filename = dirname + params['basis_func'].name()+".pickle"
+	f1 = open(filename, 'wb')
+	pickle.dump(q_estimate_his, f1)
+	f1.close()
+
 	# plot
 	plt.figure(figsize=(10, 10))
 	plt.title('state from -2 to 2 and action(-L*state)')

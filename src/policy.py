@@ -54,6 +54,48 @@ class GreedyPolicy(object):
 		self.weights = new_weights
 
 
+
+class RBFPolicy4LQR(object):
+	"""docstring for ExactPolicy4LQR"""
+	def __init__(self, basis_func):
+		super(RBFPolicy4LQR, self).__init__()
+		self.get_action_training = self.get_best_action
+		self.basis_func = basis_func
+		n = basis_func.size()
+		self.weights = mb.rand(n,1)
+		# use the best L 
+		self.get_action_iteracting = self.get_best_action
+
+	def q_state_action_func(self, state, action):
+		basis = self.basis_func.evaluate(state,action)
+		return basis.T * self.weights
+
+	def estimate_policy_L(self):
+		w3 = self.weights.getA()[2][0]
+		w4 = self.weights.getA()[3][0]
+		return np.matrix(w4/(2*w3))
+
+	def get_best_action(self, state):
+		actions = np.linspace(-5,5,200)
+		q_sa_estimate = []
+		for i in range(len(actions)):
+			action = actions[i]
+			q_sa_estimate.append((self.q_state_action_func(state, action)).item())
+		index = np.argmax(q_sa_estimate)
+		print("best_action: {}".format(actions[index]))
+		return actions[index]
+
+	# action with gaussian noise mean0 noise 1
+	def get_best_action_noise(self, state):
+		u = self.get_best_action(state)
+		m = u.shape[0]
+		# noise is scala or vector? 
+		return u + np.random.normal(0,1,m)
+
+	def update_weights(self, new_weights):
+		self.weights = np.matrix(new_weights)
+
+
 class ExactPolicy4LQR(object):
 	"""docstring for ExactPolicy4LQR"""
 	def __init__(self, basis_func, L=None):

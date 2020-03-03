@@ -41,7 +41,7 @@ def main():
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
 	parser.add_argument('--sample_max_steps', default="2000", choices=["2000","5000","10000","20000"])
 	parser.add_argument('--max_steps', default=500, type=int)
-	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2"])
+	parser.add_argument('--reg_opt', default="l1", choices=["l1","l2"])
 	parser.add_argument('--reg_param', default=0.01, type=float)
 	parser.add_argument('--rbf_sigma', default=0.001, type=float)
 	# parser.add_argument('--batch_size', default=2000, type=int)
@@ -67,8 +67,8 @@ def main():
 	# esitimate specific L
 	L=np.matrix(params['L'])
 
-	params['policy'] = ExactPolicy4LQR(params['basis_func'], L)
-
+	# params['policy'] = ExactPolicy4LQR(params['basis_func'], L)
+	params['policy'] = RBFPolicy4LQR(params['basis_func'])
 	# set the parameters for agent
 	batch_size = params['sample_max_steps']
 	max_steps = params['max_steps']
@@ -128,13 +128,13 @@ def main():
 	# f.close()
 	# save q_estimate
 
-	if params['basis_func'].name()[:3] == 'RBF':
-		filename = dirname + params['basis_func'].name()+"-"+str(params['basis_function_dim'])+"-"+params['reg_opt']+"-"+str(params['reg_param'])+".pickle"
-	else:
-		filename = dirname + params['basis_func'].name()+".pickle"
-	f1 = open(filename, 'wb')
-	pickle.dump(q_estimate_his, f1)
-	f1.close()
+	# if params['basis_func'].name()[:3] == 'RBF':
+	# 	filename = dirname + params['basis_func'].name()+"-"+str(params['basis_function_dim'])+"-"+params['reg_opt']+"-"+str(params['reg_param'])+".pickle"
+	# else:
+	# 	filename = dirname + params['basis_func'].name()+".pickle"
+	# f1 = open(filename, 'wb')
+	# pickle.dump(q_estimate_his, f1)
+	# f1.close()
 
 
 	plt.figure(figsize=(8, 6))
@@ -186,13 +186,13 @@ def main():
 	# f.close()
 
 	# estimate
-	if params['basis_func'].name()[:3]=='RBF':
-		filename = dirname + params['basis_func'].name()+"-"+str(params['basis_function_dim'])+"-"+params['reg_opt']+"-"+str(params['reg_param'])+".pickle"
-	else:
-		filename = dirname + params['basis_func'].name()+".pickle"
-	f1 = open(filename, 'wb')
-	pickle.dump(q_estimate_his, f1)
-	f1.close()
+	# if params['basis_func'].name()[:3]=='RBF':
+	# 	filename = dirname + params['basis_func'].name()+"-"+str(params['basis_function_dim'])+"-"+params['reg_opt']+"-"+str(params['reg_param'])+".pickle"
+	# else:
+	# 	filename = dirname + params['basis_func'].name()+".pickle"
+	# f1 = open(filename, 'wb')
+	# pickle.dump(q_estimate_his, f1)
+	# f1.close()
 
 	# plot
 	plt.figure(figsize=(10, 10))
