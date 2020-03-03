@@ -58,10 +58,10 @@ def main():
 	# params['basis_func'] = ExactBasis4LQR()
 	params['basis_func'] = RBF_LQR(params['state_dim'], n_features, params['rbf_sigma'])
 
-	# esitimate specific L
-	L=np.matrix(params['L'])
+	# # esitimate specific L
+	# L=np.matrix(params['L'])
 
-	params['policy'] = RBFPolicy4LQR(params['basis_func'], L)
+	params['policy'] = RBFPolicy4LQR(params['basis_func'])
 
 	# set the parameters for agent
 	batch_size = params['sample_max_steps']
@@ -77,32 +77,19 @@ def main():
 	print("length of sample: {}".format(len(sample)))
 	error_list, new_weights = agent.train(sample)
 
-	state = env.reset()
-	actions_true = []
-	actions_estimate = []
-	for i_steps in range(max_steps):
-		# select action:
-		actions = np.linspace(-5,5,200)
-		q_sa_estimate = []
-		q_sa_true = []
-		for i in range(len(actions)):
-			action = actions[i]
-			q_sa_estimate.append((agent.policy.q_state_action_func(state, action)).item())
-			q_sa_true.append(env.true_Qvalue(L, gamma, state, action))
-		action_index = np.argmax(q_sa_estimate)
-		actions_estimate.append(actions[action_index])
-		a_true_index = np.argmax(q_sa_true)
-		actions_true.append(actions[a_true_index])
-		# step 
-		state_, reward, done, info = env.step(action)
-		state = state_
-	# plot
-	print("actions_true: {}".format(actions_true))
-	print("actions_estimate: {}".format(actions_estimate))
-	plt.plot(np.arange(max_steps), actions_true)
-	plt.plot(np.arange(max_steps), actions_estimate)
-	plt.show()
+	states = np.linspace(-10,10,500)
 
+	actions_estimate = []
+	for i in range(len(states)):
+	    state = np.matrix(states[i])
+	    action = agent.policy.get_best_action(state)
+	    actions_estimate.append(action)
+	trueL = env.optimal_policy_L(gamma).item()
+
+	# plot
+	plt.plot(states, actions_estimate)
+	plt.plot(states, -L*states)
+	plt.legend(('estimate', 'true'))
 	# clean
 	env.close()
 
