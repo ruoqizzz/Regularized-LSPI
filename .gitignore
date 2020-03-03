@@ -25,10 +25,12 @@ Src/images/*
 *.txt
 
 # data saving
-src/data
+src/data 
 
 # debug file
 debug*
 
 # samples
 src/samples/*
+!src/samples/LQR/gaussian_actions_2000_2.pickle
+!src/samples/LQR/gaussian_actions_2000.pickle

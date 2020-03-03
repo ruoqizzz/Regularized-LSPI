@@ -34,7 +34,7 @@ def main():
 	parser.add_argument('--basis_function_dim', default=200, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
 	parser.add_argument('--sample_max_steps', default="2000", choices=["2000","5000","10000","20000"])
-	parser.add_argument('--max_steps', default=500, type=int)
+	parser.add_argument('--max_steps', default=20, type=int)
 	parser.add_argument('--reg_opt', default="l1", choices=["l1","l2"])
 	parser.add_argument('--reg_param', default=0.01, type=float)
 	parser.add_argument('--rbf_sigma', default=0.001, type=float)
@@ -61,7 +61,7 @@ def main():
 	# esitimate specific L
 	L=np.matrix(params['L'])
 
-	params['policy'] = ExactPolicy4LQR(params['basis_func'], L)
+	params['policy'] = RBFPolicy4LQR(params['basis_func'], L)
 
 	# set the parameters for agent
 	batch_size = params['sample_max_steps']
@@ -86,24 +86,29 @@ def main():
 		q_sa_estimate = []
 		q_sa_true = []
 		for i in range(len(actions)):
-			action = action[i]
+			action = actions[i]
 			q_sa_estimate.append((agent.policy.q_state_action_func(state, action)).item())
 			q_sa_true.append(env.true_Qvalue(L, gamma, state, action))
-		action = np.argmax(q_sa_estimate)
-		actions_estimate.append(action)
-		a_true = np.argmax(q_sa_true)
-    	actions_true.append(a_true)
-    	# step 
+		action_index = np.argmax(q_sa_estimate)
+		actions_estimate.append(actions[action_index])
+		a_true_index = np.argmax(q_sa_true)
+		actions_true.append(actions[a_true_index])
+		# step 
 		state_, reward, done, info = env.step(action)
-	
+		state = state_
 	# plot
+	print("actions_true: {}".format(actions_true))
+	print("actions_estimate: {}".format(actions_estimate))
 	plt.plot(np.arange(max_steps), actions_true)
 	plt.plot(np.arange(max_steps), actions_estimate)
 	plt.show()
 
+	# clean
+	env.close()
 
 
-
+if __name__ == '__main__':
+	main()
 
 
 

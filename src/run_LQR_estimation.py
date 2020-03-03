@@ -37,7 +37,7 @@ def main():
 	parser.add_argument('--env_name', default="LQR", choices=["cliff-v0","CartPole-v0","inverted_pedulum","LQR","chain"])	# gym env to train
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
-	parser.add_argument('--basis_function_dim', default=100, type=int)
+	parser.add_argument('--basis_function_dim', default=200, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
 	parser.add_argument('--sample_max_steps', default="2000", choices=["2000","5000","10000","20000"])
 	parser.add_argument('--max_steps', default=500, type=int)
@@ -68,7 +68,7 @@ def main():
 	L=np.matrix(params['L'])
 
 	# params['policy'] = ExactPolicy4LQR(params['basis_func'], L)
-	params['policy'] = RBFPolicy4LQR(params['basis_func'])
+	params['policy'] = RBFPolicy4LQR(params['basis_func'], L)
 	# set the parameters for agent
 	batch_size = params['sample_max_steps']
 	max_steps = params['max_steps']

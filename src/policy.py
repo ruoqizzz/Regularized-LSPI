@@ -57,9 +57,14 @@ class GreedyPolicy(object):
 
 class RBFPolicy4LQR(object):
 	"""docstring for ExactPolicy4LQR"""
-	def __init__(self, basis_func):
+	def __init__(self, basis_func, L = None):
 		super(RBFPolicy4LQR, self).__init__()
-		self.get_action_training = self.get_best_action
+		if L==None:
+			self.get_action_training = self.get_best_action
+		else:
+			self.L = L
+			self.get_action_training = self.get_action_with_L
+			
 		self.basis_func = basis_func
 		n = basis_func.size()
 		self.weights = mb.rand(n,1)
@@ -70,11 +75,6 @@ class RBFPolicy4LQR(object):
 		basis = self.basis_func.evaluate(state,action)
 		return basis.T * self.weights
 
-	def estimate_policy_L(self):
-		w3 = self.weights.getA()[2][0]
-		w4 = self.weights.getA()[3][0]
-		return np.matrix(w4/(2*w3))
-
 	def get_best_action(self, state):
 		actions = np.linspace(-5,5,200)
 		q_sa_estimate = []
@@ -83,7 +83,13 @@ class RBFPolicy4LQR(object):
 			q_sa_estimate.append((self.q_state_action_func(state, action)).item())
 		index = np.argmax(q_sa_estimate)
 		print("best_action: {}".format(actions[index]))
+
 		return actions[index]
+
+	def get_action_with_L(self, state):
+		action = - self.L * state
+		# print("action: {}".format(action))
+		return action
 
 	# action with gaussian noise mean0 noise 1
 	def get_best_action_noise(self, state):
@@ -133,11 +139,6 @@ class ExactPolicy4LQR(object):
 		return action
 
 	def get_action_with_L(self, state):
-		# [1, s.T*s, s.T*u, u.T*u] 
-		# print("state: {}".format(state))
-		# print("weights: {}".format(self.weights))
-		w3 = self.weights.getA()[2][0]
-		w4 = self.weights.getA()[3][0]
 		action = - self.L * state
 		# print("action: {}".format(action))
 		return action
