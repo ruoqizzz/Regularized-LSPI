@@ -64,7 +64,7 @@ class RBFPolicy4LQR(object):
 		else:
 			self.L = L
 			self.get_action_training = self.get_action_with_L
-			
+
 		self.basis_func = basis_func
 		n = basis_func.size()
 		self.weights = mb.rand(n,1)
@@ -76,14 +76,13 @@ class RBFPolicy4LQR(object):
 		return basis.T * self.weights
 
 	def get_best_action(self, state):
-		actions = np.linspace(-5,5,200)
+		actions = np.linspace(-6,6,100)
 		q_sa_estimate = []
 		for i in range(len(actions)):
 			action = actions[i]
 			q_sa_estimate.append((self.q_state_action_func(state, action)).item())
 		index = np.argmax(q_sa_estimate)
-		print("best_action: {}".format(actions[index]))
-
+		# print("best_action: {}".format(actions[index]))
 		return actions[index]
 
 	def get_action_with_L(self, state):

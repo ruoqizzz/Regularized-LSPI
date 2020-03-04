@@ -107,7 +107,7 @@ def main():
 	state_high = 10.0
 	states = np.linspace(state_low, state_high, 100)
 	actions = []
-	true_weights_his = []
+	# true_weights_his = []
 	true_estimate_error_history = []
 	q_true_his = []
 	q_estimate_his = []

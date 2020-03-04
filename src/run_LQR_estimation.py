@@ -83,8 +83,7 @@ def main():
 	print("length of sample: {}".format(len(sample)))
 	error_list, new_weights = agent.train(sample)
 
-	# logging
-	true_weights_his = []
+
 	true_estimate_error_history = []
 	q_true_his = []
 	q_estimate_his = []
@@ -104,11 +103,11 @@ def main():
 		q_estimate_his.append(q_estimate)
 		q_true_his.append(q_true)
 
-	true_weights = env.true_weights(L, gamma)
-	print("true_weights: {}".format(true_weights))
-	estimate_weights = agent.policy.weights
-	print("estimate_weights: {}".format(estimate_weights))
-	# true_estimate_error = np.linalg.norm(true_weights-estimate_weights)
+	# true_weights_scala = env.true_weights_scala(L, gamma)
+	# print("true_weights_scala: {}".format(true_weights_scala))
+	# estimate_weights = agent.policy.weights
+	# print("estimate_weights: {}".format(estimate_weights))
+	# true_estimate_error = np.linalg.norm(true_weights_scala-estimate_weights)
 	# print("true_estimate_error: {}".format(true_estimate_error))
 
 	now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
@@ -154,7 +153,7 @@ def main():
 	state_high = 10.0
 	states = np.linspace(state_low, state_high, 100)
 	actions = []
-	true_weights_his = []
+	# true_weights_scala_his = []
 	true_estimate_error_history = []
 	q_true_his = []
 	q_estimate_his = []

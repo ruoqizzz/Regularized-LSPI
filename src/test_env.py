@@ -11,7 +11,6 @@ import numpy as np
 
 def test_inverted_pendulum():
 	env = InvertedPendulumEnv()
-	# env = gym.make("Pendulum-v0")
 	env.reset()
 	for _ in range(2000):
 		env.render()
@@ -26,7 +25,6 @@ def test_inverted_pendulum():
 
 def test_chain():
 	env = ChainEnv()
-	# env = gym.make("Pendulum-v0")
 	obs_first = env.reset()
 	print("obs_first: {}".format(obs_first))
 	for _ in range(100):
