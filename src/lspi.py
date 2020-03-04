@@ -27,7 +27,7 @@ class LSPIAgent(object):
 		epsilon = 1-params['exploration']
 		self.policy = params['policy']
 		self.lstdq = LSTDQ(self.basis_function, self.gamma)
-		self.n_iter_max = 30
+		self.n_iter_max = 100
 		self.opt = params['reg_opt']
 		self.reg_param = params['reg_param']
 

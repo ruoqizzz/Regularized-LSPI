@@ -35,7 +35,7 @@ def main():
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
 	parser.add_argument('--sample_max_steps', default="2000", choices=["2000","5000","10000","20000"])
 	parser.add_argument('--max_steps', default=20, type=int)
-	parser.add_argument('--reg_opt', default="l1", choices=["l1","l2"])
+	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2"])
 	parser.add_argument('--reg_param', default=0.01, type=float)
 	parser.add_argument('--rbf_sigma', default=0.001, type=float)
 	# parser.add_argument('--batch_size', default=2000, type=int)
@@ -88,8 +88,10 @@ def main():
 
 	# plot
 	plt.plot(states, actions_estimate)
-	plt.plot(states, -L*states)
+	plt.plot(states, -trueL*states)
 	plt.legend(('estimate', 'true'))
+	plt.show(
+		)
 	# clean
 	env.close()
 
