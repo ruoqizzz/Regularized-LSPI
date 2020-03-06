@@ -49,6 +49,22 @@ def collect_samples_gaussian(env, max_steps):
 	# f = open(filename, 'wb')
 	# pickle.dump(replay_buffer, f)
 
+def collect_LQR_gaussian(env, max_steps):
+	# shape of state
+	m = env.m
+	# shape of action
+	n = env.n
+	replay_buffer = ReplayBuffer()
+	i_episode_steps = 0
+	state = env.reset()
+	done  = False
+	while i_episode_steps < max_steps:
+		i_episode_steps += 1
+		action = np.matrix(np.random.normal(0, 1, n).reshape(n,1))
+		state_, reward, done, info = env.step(action)
+		replay_buffer.store(state, action, reward, state_, done)
+		state = state_
+	return replay_buffer
 
 def collect_samples_sa(env, states,L):
 	replay_buffer = ReplayBuffer()
