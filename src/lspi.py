@@ -27,7 +27,7 @@ class LSPIAgent(object):
 		epsilon = 1-params['exploration']
 		self.policy = params['policy']
 		self.lstdq = LSTDQ(self.basis_function, self.gamma)
-		self.n_iter_max = 100
+		self.n_iter_max = 30
 		self.opt = params['reg_opt']
 		self.reg_param = params['reg_param']
 
@@ -39,7 +39,7 @@ class LSPIAgent(object):
 			new_weights = self.lstdq.training(sample, self.policy, self.opt, self.reg_param)
 			# print(new_weights)
 			error = np.linalg.norm((new_weights - self.policy.weights))
-			# print("error when update_weights in iteration {}: {}".format(i_iter,error))
+			print("error when update_weights in iteration {}: {}".format(i_iter,error))
 			error_his.append(error)
 			self.policy.update_weights(new_weights)
 			i_iter += 1

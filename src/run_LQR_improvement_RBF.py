@@ -85,13 +85,19 @@ def main():
 	    action = agent.policy.get_best_action(state)
 	    actions_estimate.append(action)
 	trueL = env.optimal_policy_L(gamma).item()
+	# save agent
+	import pickle
+	now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
+	fn = "data/agent/agent-"+str(params['reg_opt'])+"-"+str(params['reg_param'])+"-BF"+str(n_features)+".pkl"
+	f = open(fn, 'wb')
+	pickle.dump(agent, f)
+	f.close()
 
 	# plot
 	plt.plot(states, actions_estimate)
 	plt.plot(states, -trueL*states)
 	plt.legend(('estimate', 'true'))
-	plt.show(
-		)
+	plt.show()
 	# clean
 	env.close()
 
