@@ -37,14 +37,21 @@ class RBF_LQR(object):
 	"""docstring for RBF"""
 	def __init__(self, input_dim, n_features, gamma):
 		super(RBF_LQR, self).__init__()
-		self.input_dim = input_dim
+		if len(input_dim)>1:
+			self.state_dim = input_dim[0]
+			self.action_dim = input_dim[1]
+		else:
+			self.state_dim = input_dim
+			self.action_dim = input_dim
 		self.n_features = n_features
 		# TODO gamma -> width
 		# keep not so big
 		# RANDOM give a range
 		self.gamma = gamma
 		# the range of mean 
-		self.feature_means = [np.random.uniform([-10,-5],[10,5], (3,2)).transpose((1,0)) for _ in range(self.n_features-1)]
+		# self.feature_means = [np.random.uniform([-10,-5],[10,5], (3,2)).transpose((1,0)) for _ in range(self.n_features-1)]
+		self.state_means = [ np.random.uniform(-10, 10, self.state_dim) for _ in range(n_features-1)]
+		self.actions_means = [ np.random.uniform(-6, 6, self.action_dim) for _ in range(n_features-1)]
 		# TODO: -2,2 10 
 		# TODO: -10,10 10
 		# self.feature_means = [np.arange(-2,2,4/(self.n_features-1))]*input_dim
@@ -53,17 +60,16 @@ class RBF_LQR(object):
 	def size(self):
 		return self.n_features
 
-	def __calcu_basis_component(self,state, action, mean, gamma):
-		state = np.array(state).reshape(1,self.input_dim)
-		action = np.array(action).reshape(1,self.input_dim)
-		mean_diff = [state,action] - mean
-		return np.exp(-gamma*np.sum(mean_diff*mean_diff))
+	def __calcu_basis_component(self,state, action, state_mean, action_mean, gamma):
+		state = np.array(state).reshape(1,self.state_dim)[0]
+		action = np.array(action).reshape(1,self.action_dim)[0]
+		state_diff = state - state_mean
+		action_diff = action - action_mean
+		return np.exp(-gamma*np.sum(state_diff*state_diff)) + np.exp(-gamma*np.sum(action_diff*action_diff))
 
 	def evaluate(self, state, action):
 		n = self.size()
-		s = state
-		u = action
-		offset_phi = [self.__calcu_basis_component(state, action, mean, self.gamma) for mean in self.feature_means]
+		offset_phi = [self.__calcu_basis_component(state, action, self.state_means[i], self.actions_means[i], self.gamma) for i in range(n-1)]
 		return np.array([1] + offset_phi)
 
 	def name(self):

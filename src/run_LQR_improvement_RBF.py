@@ -56,7 +56,7 @@ def main():
 	n_features = params['basis_function_dim']
 	gamma = params['weight_discount']
 	# params['basis_func'] = ExactBasis4LQR()
-	params['basis_func'] = RBF_LQR(params['state_dim'], n_features, params['rbf_sigma'])
+	params['basis_func'] = RBF_LQR([params['state_dim'], params['n_actions']], n_features, params['rbf_sigma'])
 
 	# # esitimate specific L
 	# L=np.matrix(params['L'])
@@ -77,14 +77,17 @@ def main():
 	print("length of sample: {}".format(len(sample)))
 	error_list, new_weights = agent.train(sample)
 
-	states = np.linspace(-10,10,500)
-
+	# states = np.linspace(-10,10,500)
+	states = np.linspace([-10]*env.m, [10]*env.m, 500)
+	trueL = env.optimal_policy_L(gamma)
 	actions_estimate = []
+	actions_true = []
 	for i in range(len(states)):
-	    state = np.matrix(states[i])
+	    state = np.matrix(states[i].reshape(env.m,1))
 	    action = agent.policy.get_best_action(state)
 	    actions_estimate.append(action)
-	trueL = env.optimal_policy_L(gamma).item()
+	    actions_true.append(-trueL*state)
+	
 	# save agent
 	import pickle
 	now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 

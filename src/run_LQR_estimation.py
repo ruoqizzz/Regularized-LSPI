@@ -62,8 +62,8 @@ def main():
 	n_features = params['basis_function_dim']
 	gamma = params['weight_discount']
 	# params['basis_func'] = ExactBasis4LQR()
-	params['basis_func'] = RBF_LQR(params['state_dim'], n_features, params['rbf_sigma'])
-
+	params['basis_func'] = RBF_LQR([params['state_dim'], params['n_actions']], n_features, params['rbf_sigma'])
+	
 	# esitimate specific L
 	L=np.matrix(params['L'])
 
