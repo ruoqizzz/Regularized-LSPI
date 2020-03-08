@@ -41,8 +41,8 @@ class RBF_LQR(object):
 			self.state_dim = input_dim[0]
 			self.action_dim = input_dim[1]
 		else:
-			self.state_dim = input_dim
-			self.action_dim = input_dim
+			self.state_dim = input_dim[0]
+			self.action_dim = input_dim[0]
 		self.n_features = n_features
 		# TODO gamma -> width
 		# keep not so big
