@@ -37,12 +37,11 @@ class RBF_LQR(object):
 	"""docstring for RBF"""
 	def __init__(self, input_dim, n_features, gamma):
 		super(RBF_LQR, self).__init__()
-		if len(input_dim)>1:
+		if len(input_dim)==2:
 			self.state_dim = input_dim[0]
 			self.action_dim = input_dim[1]
 		else:
-			self.state_dim = input_dim[0]
-			self.action_dim = input_dim[0]
+			raise ValueError("len(input_dim) should be 2: state_dim and action_dim")
 		self.n_features = n_features
 		# TODO gamma -> width
 		# keep not so big
@@ -65,7 +64,7 @@ class RBF_LQR(object):
 		action = np.array(action).reshape(1,self.action_dim)[0]
 		state_diff = state - state_mean
 		action_diff = action - action_mean
-		return np.exp(-gamma*np.sum(state_diff*state_diff)) + np.exp(-gamma*np.sum(action_diff*action_diff))
+		return np.exp(-gamma*(np.sum(state_diff*state_diff)+np.sum(action_diff*action_diff)))
 
 	def evaluate(self, state, action):
 		n = self.size()
