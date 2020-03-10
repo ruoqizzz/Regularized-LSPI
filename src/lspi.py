@@ -75,7 +75,7 @@ class LSTDQ(object):
 		i_sample = 0
 		smaples_start = time.time()
 		for s in samples:
-			# i_smaple_start = time.time()
+			i_smaple_start = time.time()
 			state = s.state
 			action = s.action
 			reward = s.reward
@@ -101,8 +101,8 @@ class LSTDQ(object):
 			loss = phi - self.gamma*phi_next
 			phi = np.reshape(phi, [n, 1])
 			loss = np.reshape(loss, [1, n])
-			# i_sample_loss = time.time()
-			# print("loss calculation time per sample: {}".format(i_sample_loss - i_smaple_start))
+			i_sample_loss = time.time()
+			print("loss calculation time per sample: {}".format(i_sample_loss - i_smaple_start))
 			# print("phi: {}".format(phi))
 			# print("loss: {}".format(loss))
 			# print("A: {}".format(A))
@@ -136,6 +136,8 @@ class LSTDQ(object):
 			print("w calculation time: {}".format(w_done - samples_done))
 			print("w: {}".format(w))
 			return w
+		else:
+			print('wrong type of regularization')
 
 
 
