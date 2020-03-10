@@ -72,8 +72,10 @@ class LSTDQ(object):
 			np.fill_diagonal(A, reg_param)  # Singular matrix error
 		else:
 			np.fill_diagonal(A, 0.01)
-
+		i_sample = 0
+		smaples_start = time.time()
 		for s in samples:
+			# i_smaple_start = time.time()
 			state = s.state
 			action = s.action
 			reward = s.reward
@@ -94,15 +96,23 @@ class LSTDQ(object):
 			else:
 				# print("done")
 				phi_next = np.zeros(n)
+			
+			
 			loss = phi - self.gamma*phi_next
 			phi = np.reshape(phi, [n, 1])
 			loss = np.reshape(loss, [1, n])
+			# i_sample_loss = time.time()
+			# print("loss calculation time per sample: {}".format(i_sample_loss - i_smaple_start))
 			# print("phi: {}".format(phi))
 			# print("loss: {}".format(loss))
 			# print("A: {}".format(A))
 			A += np.dot(phi, loss)
 			b += phi * reward
-
+			i_sample_ab = time.time()
+			# print("A b calculation time per sample: {}".format(i_sample_ab - i_sample_loss))
+			i_sample += 1
+		samples_done  = time.time()
+		print("A b calculation time for all samples: {}".format(samples_done - smaples_start))
 		if opt=='l2':
 			# \beta of regularization l2 depends on initA
 			
@@ -110,6 +120,8 @@ class LSTDQ(object):
 			# print("b: {}".format(b))
 			inv_A = np.linalg.inv(A)
 			w = np.dot(inv_A, b)
+			w_done = time.time()
+			print("w calculation time: {}".format(w_done - samples_done))
 			print("w: {}".format(w))
 			return w
 		elif opt=='l1':
@@ -120,23 +132,10 @@ class LSTDQ(object):
 			clf = linear_model.Lasso(alpha=reg_param, max_iter=10000,tol=0.0001)
 			clf.fit(A, b)
 			w = np.matrix(clf.coef_).reshape(len(clf.coef_),1)
+			w_done = time.time()
+			print("w calculation time: {}".format(w_done - samples_done))
 			print("w: {}".format(w))
 			return w
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
