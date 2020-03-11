@@ -102,9 +102,9 @@ class LSTDQ(object):
 			phi = np.reshape(phi, [n, 1])
 			loss = np.reshape(loss, [1, n])
 			i_sample_loss = time.time()
-			print("loss calculation time per sample: {}".format(i_sample_loss - i_smaple_start))
+			# print("loss calculation time per sample: {}".format(i_sample_loss - i_smaple_start))
 			# print("phi: {}".format(phi))
-			# print("loss: {}".format(loss))
+			# print("loss: {}".for mat(loss))
 			# print("A: {}".format(A))
 			A += np.dot(phi, loss)
 			b += phi * reward
