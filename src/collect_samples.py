@@ -8,7 +8,7 @@ from env.linear_quadratic_regulator import LQREnv
 Transition = namedtuple('Transition',
                         ('state', 'action','reward', 'next_state', 'done'))
 
-def collect_samples(env, agent, max_steps, option):
+def collect_samples_maxstep(env, agent, max_steps):
 	ifRandom = False
 	replay_buffer = ReplayBuffer()
 	if agent==None:
@@ -27,6 +27,13 @@ def collect_samples(env, agent, max_steps, option):
 	return replay_buffer
 
 
+
+def collect_samples_maxepisode(env, agent, max_episodes, max_steps=None):
+	ifRandom = False
+	replay_buffer = ReplayBuffer()
+	if agent==None:
+		# random policy
+		ifRandom = True
 	while i_episode<max_episodes:
 		state = env.reset()
 		done  = False
