@@ -14,7 +14,7 @@ from policy import *
 
 def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--env_name', default="LQR", choices=["cliff-v0","CartPole-v0","inverted_pedulum","LQR","chain"])	# gym env to train
+	parser.add_argument('--env_name', default="CartPole-v0", choices=["cliff-v0","CartPole-v0","inverted_pedulum","chain"])	# gym env to train
 	parser.add_argument('--episode_num', default=10000, type=int)
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
@@ -30,8 +30,6 @@ def main():
 	# set env
 	if params['env_name']=="inverted_pedulum":
 		env = InvertedPendulumEnv()
-	elif params['env_name']=="LQR":
-		env = LQREnv()
 	elif params['env_name']=="chain":
 		env = ChainEnv()
 	else:
@@ -42,35 +40,12 @@ def main():
 	update_freq = params['update_freq']
 	n_episode = params['episode_num']
 
-	if params['env_name']=="chain":
-		params['state_dim'] = env.observation_space.n
-	else:
-		params['state_dim'] = env.observation_space.shape[0]
+	params['n_actions'] = env.action_space.n
+	params['state_dim'] = env.observation_space.shape[0]
 
-	if params['env_name']=="LQR":
-		# print(env.action_space)
-		params['n_actions'] = env.action_space.shape[0]
-	# print('n_actions: {}'.format(params['n_actions']))
-	else:
-		params['n_actions'] = env.action_space.n
-	
-	env2basis = {
-		'LQR': ExactBasis4LQR(),
-		'chain': Polinomial4DiscreteState(2,params['n_actions'])
-	}
-	# setting for basis_func
-	if params['env_name'] is in env2basis:
-		basis_func = env2basis[params['env_name']]
-	else:
-		basis_func = RBF(params['state_dim'], params['basis_function_dim'], params['n_actions'], params['weight_discount'])
+	basis_func = RBF(params['state_dim'], params['basis_function_dim'], params['n_actions'], params['weight_discount'])
 	params['basis_func'] = basis_func
-	env2policy = {
-		'LQR': ExactPolicy4LQR(basis_func=params['basis_func'], L=np.matrix(0.3), epsilon=1-params['exploration'])
-	}
-	if params['env_name'] is in env2policy:
-		params['policy'] = env2policy[params['env_name']]
-	else:
-		params['policy'] = GreedyPolicy(basis_func, params['n_actions'], 1-params['exploration'])
+	params['policy'] = GreedyPolicy(basis_func, params['n_actions'], 1-params['exploration'])
 	agent = LSPIAgent(params)
 	# this replay_buffer already with samples
 	replay_buffer = collect_samples(env, agent, params['sample_max_episodes'], params['sample_max_steps'])
@@ -103,7 +78,7 @@ def main():
 				i_update += 1
 				print("i_update {}".format(i_update))
 				sample = replay_buffer.sample(batch_size)
-				error_list = agent.train(sample)
+				error_list, new_weights = agent.train(sample)
 			if done:
 				# print("i_episode_steps {}".format(i_episode_steps))
 				print("total_reward {}".format(total_reward))

@@ -15,7 +15,7 @@ class LQREnv(object):
 					   seed=1):
 		'''
 		A,B are some Matrices here
-			if state is mx1 then A is nxn, B is nxm then the u should be mx1
+			if state is mx1 then A is mxm, B is mxn then the u should be nx1
 		Z1,Z2 are some positive semi-definite weight matrices mxm or scala
 			that determines the trade-off between keeping state small and keeping action small.
 		'''
@@ -120,12 +120,11 @@ class LQREnv(object):
 		
 		P = scipy.linalg.solve_discrete_lyapunov(a, q)
 
-		w1 = gamma/(1-gamma)*np.trace(P)
+		w1 = gamma/(1-gamma)*np.trace(self.noise_cov*P)
 		w2 = Z1 + gamma*A.T*P*A
 		w3 = Z2 + gamma*B.T*P*B
 		w4 = 2*gamma*A.T*P*B
 		q_value = -(x.T*w2*x + u.T*w3*u + x.T*w4*u + w1).item()
-
 		return q_value
 
 	def true_Qvalue_state(self, L, gamma, state):
@@ -140,7 +139,7 @@ class LQREnv(object):
 		
 		P = scipy.linalg.solve_discrete_lyapunov(a, q)
 
-		q_state = -(x.T*P*x + gamma/(1-gamma)*np.trace(P))
+		q_state = -(x.T*P*x + gamma/(1-gamma)*np.trace(self.noise_cov*P))
 		return q_state.item()
 
 	def optimal_policy_L(self, gamma):
@@ -165,7 +164,7 @@ if __name__ == '__main__':
 	B = np.matrix([[0],[1]])
 	Z1 = np.matrix([[1,0],[0,0]])
 	Z2 = 0.1
-	noise_cov = np.matrix([[1],[1]])
+	noise_cov = np.matrix([[1,0],[0,1]])
 	env = LQREnv(A=A,B=B,Z1=Z1,Z2=Z2,noise_cov=noise_cov)
 	state = env.reset()
 	action = np.matrix(mb.rand(env.n,env.n))

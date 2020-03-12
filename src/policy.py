@@ -16,6 +16,7 @@ class GreedyPolicy(object):
 		self.weights = np.random.uniform(-1.0, 1.0, size=(self.n_basis_func, 1))
 		# self.weights = np.array([[0.1]]*self.n_basis_func)
 		self.get_action_iteracting = self.get_best_action_epsilon
+		self.get_action_training = self.get_best_action
 
 	def q_state_action_func(self, state, action):
 		# Q(s, a; w) = sum (pi(s, a) * weights)
