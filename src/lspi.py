@@ -8,6 +8,7 @@ import scipy
 from scipy import linalg
 import time
 from sklearn import linear_model
+import cvxpy as cp
 
 Transition = namedtuple('Transition',
 						('state', 'action','reward', 'next_state', 'done'))
@@ -74,6 +75,8 @@ class LSTDQ(object):
 			np.fill_diagonal(A, 0.01)
 		i_sample = 0
 		smaples_start = time.time()
+
+		big_phi = []
 		for s in samples:
 			i_smaple_start = time.time()
 			state = s.state
@@ -136,6 +139,7 @@ class LSTDQ(object):
 			print("w calculation time: {}".format(w_done - samples_done))
 			print("w: {}".format(w))
 			return w
+
 		else:
 			print('wrong type of regularization')
 

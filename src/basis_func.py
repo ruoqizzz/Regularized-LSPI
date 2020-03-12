@@ -11,7 +11,7 @@ class RBF(object):
 		self.n_actions = n_actions
 		self.gamma = gamma
 		# self.feature_means = [np.random.uniform(-1, 1, input_dim) for _ in range(self.n_features-1)]
-		self.feature_means = [np.random.uniform(-100, 100, input_dim) for _ in range(self.n_features-1)]
+		self.feature_means = [[np.random.uniform(-10, 10, input_dim) for _ in range(self.n_features-1)] for _ in range(self.n_actions)]
 
 	def size(self):
 		return self.n_actions*self.n_features
@@ -24,7 +24,7 @@ class RBF(object):
 		k = self.size()
 		phi = np.zeros((k,))
 		offset = self.n_features * action
-		rbf = [self.__calcu_basis_component(state, mean, self.gamma) for mean in self.feature_means]
+		rbf = [self.__calcu_basis_component(state, mean, self.gamma) for mean in self.feature_means[action]]
 		phi[offset] = 1.
 		phi[offset+1:offset+1+len(rbf)] = rbf
 		return phi

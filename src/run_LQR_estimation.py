@@ -25,9 +25,6 @@ LQR_samples_filename = {
 	5000: "samples/LQR/gaussian_actions_5000.pickle",
 	10000: "samples/LQR/gaussian_actions_10000.pickle",
 	20000: "samples/LQR/gaussian_actions_20000.pickle",
-	"-22-100": "samples/LQR/states[-2,2]_100_L=0.1.pickle",
-	"-22-1000": "samples/LQR/states[-2,2]_1000_L=0.1.pickle",
-	"-22-10000": "samples/LQR/states[-2,2]_10000_L=0.1.pickle"
 }
 
 
@@ -41,8 +38,8 @@ def main():
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
 	parser.add_argument('--sample_max_steps', default="2000", choices=["2000","5000","10000","20000"])
 	parser.add_argument('--max_steps', default=500, type=int)
-	parser.add_argument('--reg_opt', default="l1", choices=["l1","l2"])
-	parser.add_argument('--reg_param', default=0.01, type=float)
+	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2"])
+	parser.add_argument('--reg_param', default=0.001, type=float)
 	parser.add_argument('--rbf_sigma', default=0.001, type=float)
 	# parser.add_argument('--batch_size', default=2000, type=int)
 	parser.add_argument('--L', default=0.1, type=float)	# 0.0 means no random action
