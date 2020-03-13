@@ -53,6 +53,7 @@ def main():
 	agent = LSPIAgent(params)
 	samples = []
 	# this replay_buffer already with samples
+	# fns = ["samples/CartPole/CartPole-500episodes.pickle","samples/CartPole/CartPole-1000episodes.pickle"]
 	fns = ["samples/CartPole/CartPole-500episodes.pickle","samples/CartPole/CartPole-1000episodes.pickle"]
 	for fn in fns:
 		f = open(fn, 'rb')
@@ -69,6 +70,7 @@ def main():
 		test_min = []
 		for i_test in range(10):
 			for i in range(20):
+				print("agent training {} times".format(i))
 				agent.train(i_samples)
 			# evalute the policy after 20 policy iteration
 			history = []

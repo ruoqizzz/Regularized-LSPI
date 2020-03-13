@@ -125,7 +125,7 @@ class LSTDQ(object):
 			w = np.dot(inv_A, b)
 			w_done = time.time()
 			print("w calculation time: {}".format(w_done - samples_done))
-			print("w: {}".format(w))
+			# print("w: {}".format(w))
 			return w
 		elif opt=='l1':
 			# useing sklearn to solve this
@@ -137,7 +137,7 @@ class LSTDQ(object):
 			w = np.matrix(clf.coef_).reshape(len(clf.coef_),1)
 			w_done = time.time()
 			print("w calculation time: {}".format(w_done - samples_done))
-			print("w: {}".format(w))
+			# print("w: {}".format(w))
 			return w
 
 		else:
