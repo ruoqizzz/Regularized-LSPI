@@ -72,6 +72,7 @@ def main():
 			for i in range(20):
 				print("agent training {} times".format(i))
 				agent.train(i_samples)
+				print("\n")
 			# evalute the policy after 20 policy iteration
 			history = []
 			for i in range(1000):

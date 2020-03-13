@@ -41,6 +41,10 @@ class LSPIAgent(object):
 			# print(new_weights)
 			error = np.linalg.norm((new_weights - self.policy.weights))
 			print("error when update_weights in iteration {}: {}".format(i_iter,error))
+			if len(error_his)>2:
+				if error == error_his[-1] and error == error_his[-2]:
+					print("Weights jump between two values, break")
+					break;
 			error_his.append(error)
 			self.policy.update_weights(new_weights)
 			i_iter += 1
