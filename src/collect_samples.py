@@ -48,9 +48,9 @@ def collect_samples_maxepisode(env, max_episodes, agent=None, max_steps=None):
 			else:
 				action = agent.get_action(state)
 			state_, reward, done, info = env.step(action)
-			# for cart pole
-			x, xdot, theta, thetadot = state_
-			reward = -x**2 - 10*theta**2
+			# # for cart pole
+			# x, xdot, theta, thetadot = state_
+			# reward = -x**2 - 10*theta**2
 			replay_buffer.store(state, action, reward, state_, done)
 			state = state_
 			if done:
