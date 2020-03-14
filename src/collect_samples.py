@@ -4,6 +4,7 @@ from collections import namedtuple
 import numpy as np
 import pickle
 from env.linear_quadratic_regulator import LQREnv
+import gym
 
 Transition = namedtuple('Transition',
                         ('state', 'action','reward', 'next_state', 'done'))
@@ -34,7 +35,9 @@ def collect_samples_maxepisode(env, max_episodes, agent=None, max_steps=None):
 	if agent==None:
 		# random policy
 		ifRandom = True
-	while i_episode<max_episodes:
+	if max_steps ==None:
+		max_steps = np.inf
+	for i_episode in range(max_episodes):
 		state = env.reset()
 		done  = False
 		i_episode_steps = 0
@@ -45,6 +48,9 @@ def collect_samples_maxepisode(env, max_episodes, agent=None, max_steps=None):
 			else:
 				action = agent.get_action(state)
 			state_, reward, done, info = env.step(action)
+			# for cart pole
+			x, xdot, theta, thetadot = state_
+			reward = -x**2 - 10*theta**2
 			replay_buffer.store(state, action, reward, state_, done)
 			state = state_
 			if done:
@@ -99,7 +105,8 @@ def collect_samples_sa(env, states,L):
 
 if __name__ == '__main__':
 	# collect samples for 2000 steps
-	env = LQREnv()
+
+	# env = LQREnv()
 	# sample_step_list = [10000, 20000]
 	# for steps in sample_step_list:
 	# 	replay_buffer = collect_samples_gaussian(env, steps)
@@ -107,12 +114,18 @@ if __name__ == '__main__':
 	# 	pickle.dump(replay_buffer, f1)
 	# 	f1.close()
 
-	states = np.linspace(-2.0, 2.0, 10000)
-	L = np.matrix(0.1)
-	replay_buffer = collect_samples_sa(env, states, L)
-	f1 = open("samples/LQR/states[-2,2]_10000_L=0.1.pickle", 'wb')
-	pickle.dump(replay_buffer, f1)
-	f1.close()
+	# CartPole-v0
+	env = gym.make('CartPole-v0')
+	fn_pre = "samples/CartPole/CartPole"
+	slist = np.arange(1,11)*100
+	for s in slist:
+		fn  = fn_pre+str(s)+".pickle"
+		f = open(fn, 'wb')
+		replay_buffer = collect_samples_maxepisode(env, s)
+		pickle.dump(replay_buffer, f)
+		f.close()
+
+	
 
 
 

@@ -53,8 +53,19 @@ def main():
 	agent = LSPIAgent(params)
 	samples = []
 	# this replay_buffer already with samples
-	# fns = ["samples/CartPole/CartPole-500episodes.pickle","samples/CartPole/CartPole-1000episodes.pickle"]
-	fns = ["samples/CartPole/CartPole-500episodes.pickle","samples/CartPole/CartPole-1000episodes.pickle"]
+	# fns = ["samples/CartPole/CartPole-500","samples/CartPole/CartPole-1000"]
+	fns = [
+	"samples/CartPole/CartPole-100",
+	"samples/CartPole/CartPole-200",
+	"samples/CartPole/CartPole-300",
+	"samples/CartPole/CartPole-400",
+	"samples/CartPole/CartPole-500",
+	"samples/CartPole/CartPole-600",
+	"samples/CartPole/CartPole-700",
+	"samples/CartPole/CartPole-800",
+	"samples/CartPole/CartPole-900",
+	"samples/CartPole/CartPole-1000"]
+
 	for fn in fns:
 		f = open(fn, 'rb')
 		replay_buffer = pickle.load(f)
@@ -74,33 +85,42 @@ def main():
 				agent.train(i_samples)
 				print("\n")
 			# evalute the policy after 20 policy iteration
-			history = []
+			reward_history = []
+			steps_history = []
 			for i in range(1000):
 				state = env.reset()
 				done  = False
 				total_reward = 0
+				total_steps = 0
 				i_episode_steps = 0
 				while True:
 					# env.render()
 					action = agent.get_action(state)
-					state_, reward, done, info = env.step(action)
-					# if params['env_name']=="CartPole-v0":
-					# 	# recalculate reward
-					# 	x, x_dot, theta, theta_dot = state_
-					# 	r1 = -(10*x)**2
-					# 	r2 = - (10*theta)**2
-					# 	reward = r1+r2
+					state_, steps, done, info = env.step(action)
+					if params['env_name']=="CartPole-v0":
+						# recalculate reward
+						x, x_dot, theta, theta_dot = state_
+						r1 = -x**2
+						r2 = - 10*theta**2
+						reward = r1+r2
 					state = state_
 					total_reward += reward
+					total_steps += steps
 					if done:
-						history.append(total_reward)
+						reward_history.append(total_reward)
+						steps_history.append(total_steps)
 						# print("i_episode_steps {}".format(i_episode_steps))
 						print("total_reward {}".format(total_reward))
+						print("total_steps {}".format(total_steps))
 						# time.sleep(0.1)
 						break
-			test_mean.append(np.mean(history))
-			test_max.append(np.max(history))
-			test_min.append(np.min(history))
+		test_mean.append(np.mean(steps_history))
+		print("history mean {}".format(np.mean(steps_history)))
+		test_max.append(np.max(steps_history))
+		print("history max {}".format(np.max(steps_history)))
+		test_min.append(np.min(steps_history))
+		print("history min {}".format(np.min(history)))
+
 		sample_meanmean.append(np.mean(test_mean))		
 		sample_meanmax.append(np.mean(test_max))
 		sample_meanmin.append(np.mean(test_min))	

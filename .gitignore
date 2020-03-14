@@ -31,7 +31,7 @@ src/data
 debug*
 
 # samples
-src/samples/*
+src/samples/LQR/
 !src/samples/LQR/gaussian_actions_2000_2.pickle
 !src/samples/LQR/gaussian_actions_2000.pickle
 !src/samples/LQR/gaussian_actions_2d2000.pickle
