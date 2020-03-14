@@ -119,7 +119,7 @@ if __name__ == '__main__':
 	fn_pre = "samples/CartPole/CartPole"
 	slist = np.arange(1,11)*100
 	for s in slist:
-		fn  = fn_pre+str(s)+".pickle"
+		fn  = fn_pre+str(s)+"-2.pickle"
 		f = open(fn, 'wb')
 		replay_buffer = collect_samples_maxepisode(env, s)
 		pickle.dump(replay_buffer, f)
