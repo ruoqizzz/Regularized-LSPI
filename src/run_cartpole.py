@@ -26,7 +26,7 @@ def main():
 	parser.add_argument('--update_freq', default=1000, type=int)
 	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2"])
 	parser.add_argument('--reg_param', default=0.001, type=float)
-	parser.add_argument('--rbf_sigma', default=0.001, type=float)
+	parser.add_argument('--rbf_sigma', default=0.01, type=float)
 	
 	args = parser.parse_args()
 	params = vars(args)

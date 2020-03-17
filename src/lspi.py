@@ -16,7 +16,7 @@ Transition = namedtuple('Transition',
 
 class LSPIAgent(object):
 	"""docstring for LSPIAgent"""
-	def __init__(self, params):
+	def __init__(self, params, n_iter_max=50):
 		super(LSPIAgent, self).__init__()
 		self.state_dim = params['state_dim']
 		# self.n_actions = params['n_actions']
@@ -28,7 +28,7 @@ class LSPIAgent(object):
 		epsilon = 1-params['exploration']
 		self.policy = params['policy']
 		self.lstdq = LSTDQ(self.basis_function, self.gamma)
-		self.n_iter_max = 30
+		self.n_iter_max = n_iter_max
 		self.opt = params['reg_opt']
 		self.reg_param = params['reg_param']
 
