@@ -46,9 +46,9 @@ class LSPIAgent(object):
 		while error > self.stop_criterion and i_iter<self.n_iter_max:
 			i_iter += 1
 			next_actions = self.policy.get_best_action(next_states)
-			next_phi = self.policy.basis_func.evaluate(next_states, next_actions)
+			next_phi = self.policy.basis_func.evaluate(next_states, next_actions)*(1-dones).reshape(len(dones),1)
 			A = 1/states.shape[0]*phi.T@(phi-self.gamma*next_phi) 
-			# A += 0.0001*np.identity(A.shape[0])
+			A += 0.0001*np.identity(A.shape[0])
 			b =1/states.shape[0]* phi.T@rewards
 			
 			if self.opt == 'l1':

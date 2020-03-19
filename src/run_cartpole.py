@@ -59,7 +59,7 @@ def main():
 	sample_meanmean = []
 	sample_meanmax = []
 	sample_meanmin = []
-	for i_s in range(8,len(rbs)):
+	for i_s in range(3,len(rbs)):
 		print("===================================")
 		print("sample {}\n".format(num[i_s]))
 		i_samples = rbs[i_s].sample(rbs[i_s].num_buffer)
