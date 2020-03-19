@@ -160,7 +160,7 @@ class LQREnv(object):
 
 if __name__ == '__main__':
 	# test env for 2d
-	A = np.matrix([[1,1],[0,1]])
+	A = np.matrix([[0.5,1],[0,1]])
 	B = np.matrix([[0],[1]])
 	Z1 = np.matrix([[1,0],[0,0]])
 	Z2 = 0.1

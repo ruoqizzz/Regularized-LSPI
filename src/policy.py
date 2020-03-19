@@ -13,43 +13,37 @@ class GreedyPolicy(object):
 		self.n_basis_func = self.basis_func.size()
 		self.n_actions = n_actions
 		self.actions = list(range(n_actions))
-		self.weights = np.random.uniform(-1.0, 1.0, size=(self.n_basis_func, 1))
+		self.weights = np.random.randn(self.n_basis_func)
 		# self.weights = np.array([[0.1]]*self.n_basis_func)
 		self.get_action_iteracting = self.get_best_action_epsilon
 		self.get_action_training = self.get_best_action
 
-	def q_state_action_func(self, state, action):
+	def q_state_action_func(self, states, actions):
 		# Q(s, a; w) = sum (pi(s, a) * weights)
 		# # basis functions pi(s, a)
-		vector_basis = self.basis_func.evaluate(state,action)
-		return np.dot(vector_basis, self.weights)  # pi(s, a) * weights
+		phi = self.basis_func.evaluate(states,actions)
+		return phi@self.weights  # pi(s, a) * weights
 
 	# epsilon greedy
-	def get_best_action_epsilon(self, state):
-		q_state_actions = [self.q_state_action_func(state, a) for a in self.actions]
-		q_state_actions = np.reshape(q_state_actions, [len(q_state_actions), 1]) # convert to column vector
-		index = np.argmax(q_state_actions)
-		q_max = q_state_actions[index]
-		best_action = self.actions[index]
-		rng = np.random.default_rng()
-		# epsilon greedy
-		if rng.random() < self.epsilon:
-			return self.actions[index]
+	def get_best_action_epsilon(self, states):
+		if random.random() < self.epsilon:
+			rng = np.random.default_rng()
+			return rng.choice(self.n_actions, len(states))
 		else:
-			# print(self.actions)
-			return random.sample(self.actions,1)[0]
+			return self.get_best_action(states)
 
-	def get_best_action(self, state):
-		q_state_actions = [self.q_state_action_func(state, a) for a in self.actions]
-		q_state_actions = np.reshape(q_state_actions, [len(q_state_actions), 1]) # convert to column vector
-		index = np.argmax(q_state_actions)
-		q_max = q_state_actions[index]
-		best_action = self.actions[index]
-		rng = np.random.default_rng()
-		return self.actions[index]
 
-	def get_action_training(self, state):
-		return self.get_best_action(state)
+	def get_best_action(self, states):
+		Q_values = np.zeros((states.shape[0], self.n_actions))
+
+		for a in range(self.n_actions):
+			Qa = self.q_state_action_func(states, np.full(states.shape[0], a, np.int))
+			# print(Qa)
+			Q_values[:, a] = Qa
+		return np.argmax(Q_values, axis=1)
+
+	def get_action_training(self, states):
+		return self.get_best_action(states)
 
 	def update_weights(self, new_weights):
 		self.weights = new_weights

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import random
 from collections import namedtuple
+import pandas as pd
 
 MAX_BUFFSIZE = 100000
 
@@ -13,47 +14,25 @@ class ReplayBuffer(object):
 		super(ReplayBuffer, self).__init__()
 		self.buffer_size = buffer_size
 		self.random_seed = random.seed(seed)
-		self.buffer = []
+		self.buffer = pd.DataFrame(columns=['state', 'action','reward', 'next_state', 'done'])
 		self.next_index = 0
 		self.num_buffer = 0
 
 
 	def store(self, *transition):
 		# store transition
-		if self.num_buffer < self.buffer_size:
-			self.buffer.append(None)
-		self.buffer[self.next_index] = Transition(*transition)
+		self.buffer.loc[self.next_index] = Transition(*transition)._asdict()
 		self.next_index = (self.next_index+1)%self.buffer_size
-		self.num_buffer += 1
-		# print(self.num_buffer)
+		self.num_buffer = min(self.buffer_size, self.num_buffer+1)
 
 	def sample(self, batch_size):
 		if batch_size < self.num_buffer:
-			# rand =  random.sample(self.buffer[:int(self.num_buffer-batch_size/2)], int(batch_size/2))
-			# concat = rand + self.buffer[-int(batch_size/2):]
-			# return [-batch_size:] to ensure the number is correct and contains the latest sample
-			# return concat[-batch_size:]
-			return random.sample(self.buffer, batch_size)
+			samples = self.buffer.sample(n=batch_size)
+			return samples['state'].to_numpy(), samples['action'].to_numpy(), samples['reward'].to_numpy(), samples['next_state'].to_numpy(), samples['done'].to_numpy()
 		else:
-			return random.sample(self.buffer, self.num_buffer)
-
-
-	def sample_with_current(self, batch_size, current_size=0):
-		assert batch_size >= current_size
-		if batch_size < self.num_buffer:
-			if current_size==0:
-				return random.sample(self.buffer, batch_size)
-			elif batch_size==current_size:
-				return self.buffer[-current_size:]
-			else: 
-				rand =  random.sample(self.buffer[:int(self.num_buffer-current_size)], int(batch_size-current_size))
-				concat = rand + self.buffer[-current_size:]
-				return concat[-batch_size:]
-		else:
-			return random.sample(self.buffer, self.num_buffer)
+			return self.buffer['state'].to_numpy(), self.buffer['action'].to_numpy(), self.buffer['reward'].to_numpy(), self.buffer['next_state'].to_numpy(), self.buffer['done'].to_numpy()
 
 
 	def reset(self):
-		self.buffer = []
+		self.buffer = pd.DataFrame(columns=['state', 'action','reward', 'next_state', 'done'])
 		self.next_index = 0
-		self.num_buffer = 0

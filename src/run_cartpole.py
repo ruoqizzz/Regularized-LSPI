@@ -20,7 +20,7 @@ def main():
 	parser.add_argument('--episode_num', default=1000, type=int)
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
-	parser.add_argument('--basis_function_dim', default=10, type=int)
+	parser.add_argument('--basis_function_dim', default=50, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
 	parser.add_argument('--batch_size', default=1000, type=int)
 	parser.add_argument('--update_freq', default=1000, type=int)
@@ -59,7 +59,7 @@ def main():
 	sample_meanmean = []
 	sample_meanmax = []
 	sample_meanmin = []
-	for i_s in range(len(rbs)):
+	for i_s in range(8,len(rbs)):
 		print("===================================")
 		print("sample {}\n".format(num[i_s]))
 		i_samples = rbs[i_s].sample(rbs[i_s].num_buffer)
@@ -69,7 +69,7 @@ def main():
 		for i_test in range(8):
 			print("\ntest "+str(i_test))
 			# reset 
-			basis_func = RBF(params['state_dim'], n_features, params['n_actions'],params['rbf_sigma'])
+			basis_func = RBF(params['state_dim'], n_features, params['n_actions'], params['rbf_sigma'], high=np.array([2,3,0.21,2.7]))
 			params['basis_func'] = basis_func
 			policy = GreedyPolicy(params['basis_func'], params['n_actions'], 1-params['exploration'])
 			params['policy'] = policy
@@ -88,7 +88,8 @@ def main():
 				while True:
 					# env.render()
 					action = agent.get_action(state)
-					state_, reward, done, info = env.step(action)
+					# print("action: {}".format(action))
+					state_, reward, done, info = env.step(action[0])
 					# if params['env_name']=="CartPole-v0":
 					# 	# recalculate reward
 					# 	x, x_dot, theta, theta_dot = state_
