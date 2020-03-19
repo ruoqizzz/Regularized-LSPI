@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 
-# RBF: Gaussian Multidimensional Radial Basis Function
+# RBF: Gaussian Multidimensional Radial Basis Function for discrete actions
 class RBF(object):
 	"""docstring for RBF"""
 	def __init__(self, input_dim, n_features, n_actions, sigma, high=None):
@@ -18,7 +18,7 @@ class RBF(object):
 		self.feature_means = np.array([[np.random.uniform(-1*high, high) for _ in range(self.n_features-1)] for _ in range(self.n_actions)])
 		# print(self.feature_means)
 
-		
+
 	def size(self):
 		return self.n_actions*self.n_features
 
@@ -28,7 +28,7 @@ class RBF(object):
 		for i in range(states.shape[0]):
 			offset = (self.n_features)*actions[i]
 			phi[i, offset] = 1
-			rbfs = np.exp(-1/self.sigma*np.linalg.norm(states[i] - self.feature_means[actions[i]], axis=1))
+			rbfs = np.exp(-self.sigma*np.linalg.norm(states[i] - self.feature_means[actions[i]], axis=1)**2)
 			phi[i, offset+1:offset+self.n_features] = rbfs
 		return phi
 
@@ -53,7 +53,7 @@ class RBF_LQR(object):
 		# the range of mean 
 		# self.feature_means = [np.random.uniform([-10,-5],[10,5], (3,2)).transpose((1,0)) for _ in range(self.n_features-1)]
 		self.state_means = [ np.random.uniform(-10, 10, self.state_dim) for _ in range(n_features-1)]
-		self.actions_means = [ np.random.uniform(-6, 6, self.action_dim) for _ in range(n_features-1)]
+		self.action_means = [ np.random.uniform(-6, 6, self.action_dim) for _ in range(n_features-1)]
 		# TODO: -2,2 10 
 		# TODO: -10,10 10
 		# self.feature_means = [np.arange(-2,2,4/(self.n_features-1))]*input_dim
@@ -62,20 +62,18 @@ class RBF_LQR(object):
 	def size(self):
 		return self.n_features
 
-	def __calcu_basis_component(self,state, action, state_mean, action_mean, sigma):
-		state = np.array(state).reshape(1,self.state_dim)[0]
-		action = np.array(action).reshape(1,self.action_dim)[0]
-		state_diff = state - state_mean
-		action_diff = action - action_mean
-		return np.exp(-sigma*(np.sum(state_diff*state_diff)+np.sum(action_diff*action_diff)))
-
-	def evaluate(self, state, action):
-		n = self.size()
-		offset_phi = [self.__calcu_basis_component(state, action, self.state_means[i], self.actions_means[i], self.sigma) for i in range(n-1)]
-		return np.array([1] + offset_phi)
+	def evaluate(self, states, actions):
+		k = self.size()
+		phi = np.zeros( (states.shape[0], k))
+		for i in range(states.shape[0]):
+			phi[i,0] = 1
+			phi1 = np.exp(-self.sigma*(np.linalg.norm(states[i] - self.state_means, axis=1)**2+np.linalg.norm(actions[i] - self.action_means, axis=1)**2))
+			phi[i,1:] = phi1
+		return phi
 
 	def name(self):
 		return "RBF_LQR"
+
 
 class ExactBasis4LQR(object):
 	"""docstring for ExactBasis4LQR"""
@@ -86,18 +84,16 @@ class ExactBasis4LQR(object):
 	def size(self):
 		return self.n_features
 
-	def evaluate(self, state, action):
+	def evaluate(self, states, actions):
 		n = self.size()
-		phi = np.zeros((n, ))
-		s = state
-		u = action
-		# print("BasisFunc evaluate: \n")
-		# print("s: {}".format(s))
-		# print("u: {}".format(u))
+		phi = np.zeros((states.shape[0], n))
 
-		offset_phi = np.array([1, (s.T*s).item(), (u.T*u).item(), (s.T*u).item()])
+		for i in range(states.shape[0]):
+			s = states[i]
+			u = actions[i]
+			phi[i,:] = np.array([1, (s.T*s).item(), (u.T*u).item(), (s.T*u).item()])
 		# print("in basis evaluate phi_next: {}".format(offset_phi))
-		return offset_phi
+		return phi
 	
 	def name(self):
 		return "ExactBasis_LQR"

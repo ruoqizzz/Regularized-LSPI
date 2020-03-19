@@ -70,25 +70,25 @@ def main():
 	replay_buffer = pickle.load(f)
 
 	sample = replay_buffer.sample(batch_size)
-	print("length of sample: {}".format(len(sample)))
+	print("length of sample: {}".format(len(sample[0])))
 	error_list, new_weights = agent.train(sample)
 
 	# states = np.linspace(-10,10,500)
 	states = np.linspace([-10]*env.m, [10]*env.m, 500)
 	trueL = env.optimal_policy_L(gamma)
-	actions_estimate = []
+	actions_estimate = agent.policy.get_best_action(states)
 	actions_true = []
 	for i in range(len(states)):
 	    state = np.matrix(states[i].reshape(env.m,1))
-	    action = agent.policy.get_best_action(state)
-	    actions_estimate.append(action)
+	    # action = agent.policy.get_best_action(state)
+	    # actions_estimate.append(action)
 	    actions_true.append(-trueL*state)
 	
 	# save agent
 	
 	now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
 	fn = "data/agent/agent-"+str(params['reg_opt'])+"-"+str(params['reg_param'])+"-BF"+str(n_features)+".pkl"
-	f = open(fn, 'wb')
+	f = open(fn, 'wb'
 	pickle.dump(agent, f)
 	f.close()
 

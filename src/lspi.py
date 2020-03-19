@@ -40,7 +40,6 @@ class LSPIAgent(object):
 
 		phi = self.policy.basis_func.evaluate(states, actions)
 
-
 		error = float('inf')
 		error_his = []
 		i_iter = 0
@@ -49,7 +48,7 @@ class LSPIAgent(object):
 			next_actions = self.policy.get_best_action(next_states)
 			next_phi = self.policy.basis_func.evaluate(next_states, next_actions)
 			A = 1/states.shape[0]*phi.T@(phi-self.gamma*next_phi) 
-			A += 0.0001*np.identity(A.shape[0])
+			# A += 0.0001*np.identity(A.shape[0])
 			b =1/states.shape[0]* phi.T@rewards
 			
 			if self.opt == 'l1':
@@ -67,6 +66,7 @@ class LSPIAgent(object):
 					print("Weights jump between two values, break")
 					break;
 			error_his.append(error)
+			# print("new_weights: {}".format(new_weights))
 			self.policy.update_weights(new_weights)
 		return error_his, self.policy.weights
 

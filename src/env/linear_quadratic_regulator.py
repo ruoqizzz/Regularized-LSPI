@@ -104,7 +104,6 @@ class LQREnv(object):
 		w2 = (Z1 + gamma*A.T*P*A).item()
 		w3 = (Z2 + gamma*B.T*P*B).item()
 		w4 = (2*gamma*A.T*P*B).item()
-
 		return np.matrix([-w1,-w2,-w3,-w4]).reshape(4,1)
 
 	def true_Qvalue(self, L, gamma, state, action):
