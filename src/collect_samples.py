@@ -50,7 +50,7 @@ def collect_samples_maxepisode(env, max_episodes, agent=None, max_steps=None):
 			state_, reward, done, info = env.step(action)
 			# for cart pole
 			x, xdot, theta, thetadot = state_
-			# reward = -(10*x)**2 - 10*(10*theta)**2
+			reward = -(10*x)**2 - 10*(10*theta)**2
 			replay_buffer.store(state, action, reward, state_, done)
 			state = state_
 			if done:
@@ -123,10 +123,10 @@ if __name__ == '__main__':
 
 	# CartPole-v0
 	env = gym.make('CartPole-v0')
-	fn_pre = "samples/CartPole/CartPole"
+	fn_pre = "samples/CartPole/reward_shape/CartPole"
 	slist = np.arange(1,11)*100
 	for s in slist:
-		fn  = fn_pre+str(s)+"_2.pickle"
+		fn  = fn_pre+str(s)+".pickle"
 		f = open(fn, 'wb')
 		replay_buffer = collect_samples_maxepisode(env, s)
 		pickle.dump(replay_buffer, f)
