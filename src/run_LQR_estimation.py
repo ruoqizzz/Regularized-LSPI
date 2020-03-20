@@ -32,13 +32,13 @@ def main():
 	parser.add_argument('--env_name', default="LQR", choices=["cliff-v0","CartPole-v0","inverted_pedulum","LQR","chain"])	# gym env to train
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
-	parser.add_argument('--basis_function_dim', default=200, type=int)
+	parser.add_argument('--basis_function_dim', default=20, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
-	parser.add_argument('--sample_max_steps', default="5000", choices=["2000","5000"])
+	parser.add_argument('--sample_max_steps', default="2000", choices=["2000","5000"])
 	parser.add_argument('--max_steps', default=500, type=int)
 	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2"])
 	parser.add_argument('--reg_param', default=0.001, type=float)
-	parser.add_argument('--rbf_sigma', default=0.001, type=float)
+	parser.add_argument('--rbf_sigma', default=0.01, type=float)
 	# parser.add_argument('--batch_size', default=2000, type=int)
 	parser.add_argument('--L', default=0.1, type=float)	# 0.0 means no random action
 	
@@ -55,14 +55,14 @@ def main():
 	# basis function
 	n_features = params['basis_function_dim']
 	gamma = params['weight_discount']
-	params['basis_func'] = ExactBasis4LQR()
-	# params['basis_func'] = RBF_LQR([params['state_dim'], params['n_actions']], n_features, params['rbf_sigma'])
+	# params['basis_func'] = ExactBasis4LQR()
+	params['basis_func'] = RBF_LQR([params['state_dim'], params['n_actions']], n_features, params['rbf_sigma'])
 	
 	# esitimate specific L
 	L=np.matrix(params['L'])
 
-	params['policy'] = ExactPolicy4LQR(params['basis_func'], L)
-	# params['policy'] = RBFPolicy4LQR(params['basis_func'], L)
+	# params['policy'] = ExactPolicy4LQR(params['basis_func'], L)
+	params['policy'] = RBFPolicy4LQR(params['basis_func'], L)
 	# set the parameters for agent
 	batch_size = params['sample_max_steps']
 	max_steps = params['max_steps']
@@ -90,6 +90,8 @@ def main():
 	q_estimate_his = agent.policy.q_state_action_func(np.full(len(actions), state), actions)
 	for i in range(len(actions)):
 		action = np.matrix(actions[i])
+		# q_estimate = agent.policy.q_state_action_func(state, action)[0]
+		# q_estimate_his.append(q_estimate)
 		# print("q_estimate: {}".format(q_estimate))
 		q_true = env.true_Qvalue(L, gamma, state, action)
 		# print("q_true: {}".format(q_true))

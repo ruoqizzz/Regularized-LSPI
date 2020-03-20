@@ -26,7 +26,7 @@ LQR_samples_filename = {
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--env_name', default="LQR", choices=["cliff-v0","CartPole-v0","inverted_pedulum","LQR","chain"])	# gym env to train
-	parser.add_argument('--episode_num', default=40, type=int)
+	parser.add_argument('--episode_num', default=20, type=int)
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
 	parser.add_argument('--basis_function_dim', default=10, type=int)
@@ -83,7 +83,7 @@ def main():
 		while True:
 			i_episode_steps+=1
 			action = agent.get_action(state)
-			state_, reward, done, info = env.step(action)
+			state_, reward, done, info = env.step(action[0])
 			# print("state: {}".format(state))
 			# print("action: {}".format(action))
 			# print("reward: {}".format(reward))
@@ -99,7 +99,7 @@ def main():
 				break
 		# estimateL = agent.policy.estimate_policy_L().item()
 		# use true Q/weights in this L to check whether it converge to optimal one 
-		true_weights = env.true_weights(agent.policy.L, gamma)
+		true_weights = env.true_weights_scala(agent.policy.L, gamma)
 		w3 = true_weights[2].item()
 		w4 = true_weights[3].item()
 		estimateL = np.matrix(w4/(2*w3))

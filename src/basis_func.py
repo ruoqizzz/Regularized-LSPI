@@ -67,8 +67,8 @@ class RBF_LQR(object):
 		phi = np.zeros( (states.shape[0], k))
 		for i in range(states.shape[0]):
 			phi[i,0] = 1
-			phi1 = np.exp(-self.sigma*(np.linalg.norm(states[i] - self.state_means, axis=1)**2+np.linalg.norm(actions[i] - self.action_means, axis=1)**2))
-			phi[i,1:] = phi1
+			rbf = np.exp(-self.sigma*(np.linalg.norm(states[i] - self.state_means, axis=1)**2+np.linalg.norm(actions[i] - self.action_means, axis=1)**2))
+			phi[i,1:] = rbf
 		return phi
 
 	def name(self):
@@ -94,28 +94,28 @@ class ExactBasis4LQR(object):
 			phi[i,:] = np.array([1, (s.T*s).item(), (u.T*u).item(), (s.T*u).item()])
 		# print("in basis evaluate phi_next: {}".format(offset_phi))
 		return phi
-	
+
 	def name(self):
 		return "ExactBasis_LQR"
 
 
-class Polinomial4DiscreteState(object):
-	"""docstring for Polinomial4DiscreteState"""
-	def __init__(self, degree,n_actions):
-		super(Polinomial4DiscreteState, self).__init__()
-		self.n_actions = n_actions
-		self.n_features = degree+1	# e.g. 2 [1,s,s**2]
-		# self.degree = degree
-	def size(self):
-		return self.n_features * self.n_actions
+# class Polinomial4DiscreteState(object):
+# 	"""docstring for Polinomial4DiscreteState"""
+# 	def __init__(self, degree,n_actions):
+# 		super(Polinomial4DiscreteState, self).__init__()
+# 		self.n_actions = n_actions
+# 		self.n_features = degree+1	# e.g. 2 [1,s,s**2]
+# 		# self.degree = degree
+# 	def size(self):
+# 		return self.n_features * self.n_actions
 
-	def evaluate(self, state, action):
-		n = self.size()
-		phi = np.zeros((n, ))
-		offset = self.n_features*action
+# 	def evaluate(self, state, action):
+# 		n = self.size()
+# 		phi = np.zeros((n, ))
+# 		offset = self.n_features*action
 		
-		value = state
-		offset_phi = [ np.power(value, d) for d in range(self.n_features)]
-		phi[offset:offset + self.n_features] = offset_phi
-		return phi
-		
+# 		value = state
+# 		offset_phi = [ np.power(value, d) for d in range(self.n_features)]
+# 		phi[offset:offset + self.n_features] = offset_phi
+# 		return phi
+# 		

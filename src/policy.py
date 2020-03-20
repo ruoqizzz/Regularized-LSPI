@@ -58,6 +58,7 @@ class RBFPolicy4LQR(object):
 			self.get_action_training = self.get_best_action
 		else:
 			self.L = L
+			print("get_action_with_L")
 			self.get_action_training = self.get_action_with_L
 
 		self.basis_func = basis_func
@@ -83,10 +84,12 @@ class RBFPolicy4LQR(object):
 		for i in range(len(actions)):
 			Qa = self.q_state_action_func(states, np.full(states.shape[0], actions[i], np.float))
 			Q_values[:, i] = Qa
+		print("argmax(Q_values: {}".format(np.argmax(Q_values, axis=1)))
 		return np.array([actions[i] for i in np.argmax(Q_values, axis=1)])
 
 
 	def get_action_with_L(self, states):
+		print("get_action_with_L")
 		actions = []
 		for state in states:
 			action = - self.L * state

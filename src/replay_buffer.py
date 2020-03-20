@@ -26,7 +26,7 @@ class ReplayBuffer(object):
 		self.num_buffer = min(self.buffer_size, self.num_buffer+1)
 
 	def sample(self, batch_size):
-		if batch_size < self.num_buffer:
+		if batch_size <= self.num_buffer:
 			samples = self.buffer.sample(n=batch_size)
 			return samples['state'].to_numpy(), samples['action'].to_numpy(), samples['reward'].to_numpy(), samples['next_state'].to_numpy(), samples['done'].to_numpy()
 		else:

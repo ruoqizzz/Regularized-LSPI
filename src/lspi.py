@@ -45,20 +45,22 @@ class LSPIAgent(object):
 		i_iter = 0
 		while error > self.stop_criterion and i_iter<self.n_iter_max:
 			i_iter += 1
-			next_actions = self.policy.get_best_action(next_states)
-			next_phi = self.policy.basis_func.evaluate(next_states, next_actions)*(1-dones).reshape(len(dones),1)
-			A = 1/states.shape[0]*phi.T@(phi-self.gamma*next_phi) 
-			A += 0.0001*np.identity(A.shape[0])
-			b =1/states.shape[0]* phi.T@rewards
+			next_actions = self.policy.get_action_training(next_states)
+			next_phi = self.policy.basis_func.evaluate(next_states, next_actions)
+			A = phi.T@(phi-self.gamma*next_phi) 
+			if self.opt=='l2':
+				A += self.reg_param*np.identity(A.shape[0])
+			else:
+				A += 0.0001*np.identity(A.shape[0])
+			b =  phi.T@rewards
 			
 			if self.opt == 'l1':
-				clf = linear_model.Lasso(alpha=self.reg_param)
+				clf = linear_model.Lasso(alpha=self.reg_param, max_iter=5000)
 				clf.fit(A, b)
 				new_weights = clf.coef_
 			if self.opt == 'l2':
-				clf = linear_model.Ridge(alpha=self.reg_param)
-				clf.fit(A, b)
-				new_weights = clf.coef_
+				new_weights = np.linalg.solve(A,b)
+
 			error = np.linalg.norm(self.policy.weights-new_weights)
 			print("error when update_weights in iteration {}: {}".format(i_iter,error))
 			if len(error_his)>2:
