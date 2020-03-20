@@ -20,12 +20,12 @@ def main():
 	parser.add_argument('--episode_num', default=1000, type=int)
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
-	parser.add_argument('--basis_function_dim', default=50, type=int)
+	parser.add_argument('--basis_function_dim', default=20, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
 	parser.add_argument('--batch_size', default=1000, type=int)
 	parser.add_argument('--update_freq', default=1000, type=int)
 	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2"])
-	parser.add_argument('--reg_param', default=0.001, type=float)
+	parser.add_argument('--reg_param', default=0.01, type=float)
 	parser.add_argument('--rbf_sigma', default=0.01, type=float)
 	
 	args = parser.parse_args()
@@ -59,14 +59,14 @@ def main():
 	sample_meanmean = []
 	sample_meanmax = []
 	sample_meanmin = []
-	for i_s in range(3,len(rbs)):
+	for i_s in range(len(rbs)):
 		print("===================================")
 		print("sample {}\n".format(num[i_s]))
 		i_samples = rbs[i_s].sample(rbs[i_s].num_buffer)
 		test_mean = []
 		test_max = []
 		test_min = []
-		for i_test in range(8):
+		for i_test in range(2):
 			print("\ntest "+str(i_test))
 			# reset 
 			basis_func = RBF(params['state_dim'], n_features, params['n_actions'], params['rbf_sigma'], high=np.array([2,3,0.21,2.7]))

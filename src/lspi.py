@@ -51,24 +51,26 @@ class LSPIAgent(object):
 			# print(np.array(dones).astype(float))
 			next_phi = self.policy.basis_func.evaluate(next_states, next_actions)*(1.0-np.array(dones).astype(float)).reshape(len(dones),1)
 			A = phi.T@(phi-self.gamma*next_phi) 
+			# print("A: {}".format(A))
 			if self.opt=='l2':
 				A += self.reg_param*np.identity(A.shape[0])
 			else:
 				A += 0.0001*np.identity(A.shape[0])
 			b =  phi.T@rewards
+			# print("b: {}".format(b))
 			
 			if self.opt == 'l1':
-				clf = linear_model.Lasso(alpha=self.reg_param, max_iter=5000)
+				clf = linear_model.Lasso(alpha=self.reg_param, max_iter=50000)
 				clf.fit(A, b)
 				new_weights = clf.coef_
 			if self.opt == 'l2':
 				new_weights = np.linalg.solve(A,b)
-
 			error = np.linalg.norm(self.policy.weights-new_weights)
 			print("error when update_weights in iteration {}: {}".format(i_iter,error))
 			if len(error_his)>2:
 				if error == error_his[-1] and error == error_his[-2]:
 					print("Weights jump between two values, break")
+					self.policy.update_weights(new_weights)
 					break;
 			error_his.append(error)
 			# print("new_weights: {}".format(new_weights))

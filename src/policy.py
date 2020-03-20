@@ -15,7 +15,7 @@ class GreedyPolicy(object):
 		self.actions = list(range(n_actions))
 		self.weights = np.random.randn(self.n_basis_func)
 		# self.weights = np.array([[0.1]]*self.n_basis_func)
-		self.get_action_iteracting = self.get_best_action_epsilon
+		self.get_action_iteracting = self.get_best_action
 		self.get_action_training = self.get_best_action
 
 	def q_state_action_func(self, states, actions):
@@ -40,10 +40,9 @@ class GreedyPolicy(object):
 			Qa = self.q_state_action_func(states, np.full(states.shape[0], a, np.int))
 			# print(Qa)
 			Q_values[:, a] = Qa
+		# print("Q_values: {}".format(Q_values))
+		# print(np.argmax(Q_values, axis=1))
 		return np.argmax(Q_values, axis=1)
-
-	def get_action_training(self, states):
-		return self.get_best_action(states)
 
 	def update_weights(self, new_weights):
 		self.weights = new_weights

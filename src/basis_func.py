@@ -4,7 +4,7 @@ import numpy as np
 # RBF: Gaussian Multidimensional Radial Basis Function for discrete actions
 class RBF(object):
 	"""docstring for RBF"""
-	def __init__(self, input_dim, n_features, n_actions, sigma, high=None):
+	def __init__(self, input_dim, n_features, n_actions, sigma, high=np.array([])):
 		super(RBF, self).__init__()
 		self.input_dim = input_dim
 		self.n_features = n_features
@@ -16,7 +16,7 @@ class RBF(object):
 			assert len(high) == input_dim
 		# self.feature_means = [np.random.uniform(-1, 1, input_dim) for _ in range(self.n_features-1)]
 		self.feature_means = np.array([[np.random.uniform(-1*high, high) for _ in range(self.n_features-1)] for _ in range(self.n_actions)])
-		# print(self.feature_means)
+		# print(self.feature_means[0])
 
 
 	def size(self):
