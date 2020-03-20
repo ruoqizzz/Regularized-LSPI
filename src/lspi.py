@@ -46,7 +46,10 @@ class LSPIAgent(object):
 		while error > self.stop_criterion and i_iter<self.n_iter_max:
 			i_iter += 1
 			next_actions = self.policy.get_action_training(next_states)
-			next_phi = self.policy.basis_func.evaluate(next_states, next_actions)*(1-dones).reshape(1,len(dones))
+			# print(self.policy.basis_func.evaluate(next_states, next_actions)[:10])
+			# print((self.policy.basis_func.evaluate(next_states, next_actions)*(1-dones).reshape(len(dones),1))[:10])
+			# print(np.array(dones).astype(float))
+			next_phi = self.policy.basis_func.evaluate(next_states, next_actions)*(1.0-np.array(dones).astype(float)).reshape(len(dones),1)
 			A = phi.T@(phi-self.gamma*next_phi) 
 			if self.opt=='l2':
 				A += self.reg_param*np.identity(A.shape[0])
