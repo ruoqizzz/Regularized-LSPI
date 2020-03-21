@@ -20,13 +20,13 @@ def main():
 	parser.add_argument('--episode_num', default=1000, type=int)
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
-	parser.add_argument('--basis_function_dim', default=20, type=int)
+	parser.add_argument('--basis_function_dim', default=200, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
 	parser.add_argument('--batch_size', default=1000, type=int)
 	parser.add_argument('--update_freq', default=1000, type=int)
 	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2"])
-	parser.add_argument('--reg_param', default=0.01, type=float)
-	parser.add_argument('--rbf_sigma', default=0.01, type=float)
+	parser.add_argument('--reg_param', default=0.0001, type=float)
+	parser.add_argument('--rbf_sigma', default=0.5, type=float)
 	
 	args = parser.parse_args()
 	params = vars(args)
@@ -49,7 +49,7 @@ def main():
 	rbs = []
 	# this replay_buffer already with samples
 	for i in np.arange(1,11)*100:
-		fn = "samples/CartPole/CartPole"+str(i)+".pickle"
+		fn = "samples/CartPole/reward_shape/CartPole"+str(i)+".pickle"
 		f = open(fn, 'rb')
 		replay_buffer = pickle.load(f)
 		rbs.append(replay_buffer)
@@ -66,10 +66,10 @@ def main():
 		test_mean = []
 		test_max = []
 		test_min = []
-		for i_test in range(2):
+		for i_test in range(10):
 			print("\ntest "+str(i_test))
 			# reset 
-			basis_func = RBF(params['state_dim'], n_features, params['n_actions'], params['rbf_sigma'], high=np.array([2,3,0.21,2.7]))
+			basis_func = RBF(params['state_dim']-2, n_features, params['n_actions'], params['rbf_sigma'], high=np.array([0.21,2.7]))
 			params['basis_func'] = basis_func
 			policy = GreedyPolicy(params['basis_func'], params['n_actions'], 1-params['exploration'])
 			params['policy'] = policy
@@ -87,6 +87,7 @@ def main():
 				i_episode_steps = 0
 				while True:
 					# env.render()
+					state = np.reshape(state[2:4], (1,2))
 					action = agent.get_action(state)
 					# print("action: {}".format(action))
 					state_, reward, done, info = env.step(action[0])
@@ -123,13 +124,9 @@ def main():
 	plt.plot(num,sample_meanmean)
 	plt.plot(num,sample_meanmax)
 	plt.plot(num,sample_meanmin)
+	plt.ylabel('Reward')
+	plt.xlabel('Episode')
 	plt.show()
-
-
-
-
-
-
 
 
 

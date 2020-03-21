@@ -2,6 +2,7 @@
 import random
 from collections import namedtuple
 import pandas as pd
+import numpy as np
 
 MAX_BUFFSIZE = 100000
 
@@ -28,9 +29,9 @@ class ReplayBuffer(object):
 	def sample(self, batch_size):
 		if batch_size <= self.num_buffer:
 			samples = self.buffer.sample(n=batch_size)
-			return samples['state'].to_numpy(), samples['action'].to_numpy(), samples['reward'].to_numpy(), samples['next_state'].to_numpy(), samples['done'].to_numpy()
+			return np.array(samples['state'].to_list()), samples['action'].to_list(), np.array(samples['reward'].to_list()), np.array(samples['next_state'].to_list()), np.array(samples['done'].to_list())
 		else:
-			return self.buffer['state'].to_numpy(), self.buffer['action'].to_numpy(), self.buffer['reward'].to_numpy(), self.buffer['next_state'].to_numpy(), self.buffer['done'].to_numpy()
+			return np.array(self.buffer['state'].to_list()), self.buffer['action'].to_list(), np.array(self.buffer['reward'].to_list()), np.array(self.buffer['next_state'].to_list()), np.array(self.buffer['done'].to_list())
 
 
 	def reset(self):

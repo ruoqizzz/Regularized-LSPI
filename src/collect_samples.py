@@ -41,7 +41,7 @@ def collect_samples_maxepisode(env, max_episodes, agent=None, max_steps=None):
 		state = env.reset()
 		done  = False
 		i_episode_steps = 0
-		while True and i_episode_steps<max_steps:
+		while True and i_episode_steps<1000:
 			i_episode_steps += 1
 			if ifRandom:
 				action = env.action_space.sample()
@@ -49,8 +49,8 @@ def collect_samples_maxepisode(env, max_episodes, agent=None, max_steps=None):
 				action = agent.get_action(state)
 			state_, reward, done, info = env.step(action)
 			# for cart pole
-			x, xdot, theta, thetadot = state_
-			reward = -(10*x)**2 - 10*(10*theta)**2
+			x, xdot, theta, thetadot = state
+			reward = -10*theta**2
 			replay_buffer.store(state, action, reward, state_, done)
 			state = state_
 			if done:
@@ -106,31 +106,31 @@ def collect_samples_sa(env, states,L):
 if __name__ == '__main__':
 	# collect samples for 2000 steps
 
-	env = LQREnv()
-	# A = np.matrix([[0.5,1],[0,1]])
-	# B = np.matrix([[0],[1]])
-	# Z1 = np.matrix([[1,0],[0,0]])
-	# Z2 = 0.1
-	# noise_cov = np.matrix([[1,0],[0,1]])
-	# env = LQREnv(A=A,B=B,Z1=Z1,Z2=Z2,noise_cov=noise_cov)
+	# env = LQREnv()
+	# # A = np.matrix([[0.5,1],[0,1]])
+	# # B = np.matrix([[0],[1]])
+	# # Z1 = np.matrix([[1,0],[0,0]])
+	# # Z2 = 0.1
+	# # noise_cov = np.matrix([[1,0],[0,1]])
+	# # env = LQREnv(A=A,B=B,Z1=Z1,Z2=Z2,noise_cov=noise_cov)
 	
-	sample_step_list = [2000, 5000]
-	for steps in sample_step_list:
-		replay_buffer = collect_samples_gaussian(env, steps)
-		f1 = open("samples/LQR/gaussian_actions_"+str(steps)+".pickle", 'wb')
-		pickle.dump(replay_buffer, f1)
-		f1.close()
+	# sample_step_list = [2000, 5000]
+	# for steps in sample_step_list:
+	# 	replay_buffer = collect_samples_gaussian(env, steps)
+	# 	f1 = open("samples/LQR/gaussian_actions_"+str(steps)+".pickle", 'wb')
+	# 	pickle.dump(replay_buffer, f1)
+	# 	f1.close()
 
 	# CartPole-v0
-	# env = gym.make('CartPole-v0')
-	# fn_pre = "samples/CartPole/reward_shape/CartPole"
-	# slist = np.arange(1,11)*100
-	# for s in slist:
-	# 	fn  = fn_pre+str(s)+".pickle"
-	# 	f = open(fn, 'wb')
-	# 	replay_buffer = collect_samples_maxepisode(env, s)
-	# 	pickle.dump(replay_buffer, f)
-	# 	f.close()
+	env = gym.make('CartPole-v0')
+	fn_pre = "samples/CartPole/reward_shape/CartPole"
+	slist = np.arange(11,20)*100
+	for s in slist:
+		fn  = fn_pre+str(s)+".pickle"
+		f = open(fn, 'wb')
+		replay_buffer = collect_samples_maxepisode(env, s)
+		pickle.dump(replay_buffer, f)
+		f.close()
 
 	
 

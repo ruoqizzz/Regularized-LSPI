@@ -32,10 +32,14 @@ class LSPIAgent(object):
 		self.reg_param = params['reg_param']
 
 	def train(self, samples):
-		states = samples[0]
+		# states = samples[0]
+		# print(states[:,2:])
+		states = samples[0][:,2:]
 		actions = samples[1]
-		rewards = samples[2]
-		next_states = samples[3]
+		# rewards = samples[2]
+		rewards = -(states[:,0]**2)
+		# next_states = samples[3]
+		next_states = samples[3][:,2:]
 		dones = samples[4]
 
 		phi = self.policy.basis_func.evaluate(states, actions)
@@ -49,14 +53,17 @@ class LSPIAgent(object):
 			# print(self.policy.basis_func.evaluate(next_states, next_actions)[:10])
 			# print((self.policy.basis_func.evaluate(next_states, next_actions)*(1-dones).reshape(len(dones),1))[:10])
 			# print(np.array(dones).astype(float))
-			next_phi = self.policy.basis_func.evaluate(next_states, next_actions)*(1.0-np.array(dones).astype(float)).reshape(len(dones),1)
-			A = phi.T@(phi-self.gamma*next_phi) 
+			next_phi = self.policy.basis_func.evaluate(next_states, next_actions)
+			# *(1.0-np.array(dones).astype(float)).reshape(len(dones),1)
+			A = 1/states.shape[0]*phi.T@(phi-self.gamma*next_phi) 
 			# print("A: {}".format(A))
 			if self.opt=='l2':
 				A += self.reg_param*np.identity(A.shape[0])
 			else:
 				A += 0.0001*np.identity(A.shape[0])
-			b =  phi.T@rewards
+			# 1/states.shape[0]
+			# A = 1/states.shape[0]* A
+			b = 1/states.shape[0]*phi.T@rewards
 			# print("b: {}".format(b))
 			
 			if self.opt == 'l1':

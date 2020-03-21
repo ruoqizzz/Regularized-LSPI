@@ -7,9 +7,11 @@ class RBF(object):
 	def __init__(self, input_dim, n_features, n_actions, sigma, high=np.array([])):
 		super(RBF, self).__init__()
 		self.input_dim = input_dim
+		# print(input_dim)
 		self.n_features = n_features
 		self.n_actions = n_actions
 		self.sigma = sigma
+		# print(high)
 		if high.size == 0:
 			high = np.array([100]*input_dim)
 		else:
