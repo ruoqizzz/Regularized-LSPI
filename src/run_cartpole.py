@@ -21,12 +21,12 @@ def main():
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
 	parser.add_argument('--basis_function_dim', default=200, type=int)
-	parser.add_argument('--stop_criterion', default=10**-5, type=float)
+	parser.add_argument('--stop_criterion', default=10**-3, type=float)
 	parser.add_argument('--batch_size', default=1000, type=int)
 	parser.add_argument('--update_freq', default=1000, type=int)
-	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2"])
+	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2","wl1"])
 	parser.add_argument('--reg_param', default=0.0001, type=float)
-	parser.add_argument('--rbf_sigma', default=0.5, type=float)
+	parser.add_argument('--rbf_sigma', default=1.0, type=float)
 	
 	args = parser.parse_args()
 	params = vars(args)
@@ -69,7 +69,9 @@ def main():
 		for i_test in range(10):
 			print("\ntest "+str(i_test))
 			# reset 
-			basis_func = RBF(params['state_dim']-2, n_features, params['n_actions'], params['rbf_sigma'], high=np.array([0.21,2.7]))
+			# dim of state!
+			# basis_func = RBF(params['state_dim']-2, n_features, params['n_actions'], params['rbf_sigma'], high=np.array([0.21,2.7]))
+			basis_func = RBF(params['state_dim'], n_features, params['n_actions'], params['rbf_sigma'], high=np.array([2.5,3,0.21,2.7]))
 			params['basis_func'] = basis_func
 			policy = GreedyPolicy(params['basis_func'], params['n_actions'], 1-params['exploration'])
 			params['policy'] = policy
@@ -80,14 +82,16 @@ def main():
 				print("")
 			# evalute the policy after 20 policy iteration
 			history = []
-			for i in range(1000):
+			for i in range(200):
 				state = env.reset()
 				done  = False
 				total_reward = 0
 				i_episode_steps = 0
 				while True:
 					# env.render()
-					state = np.reshape(state[2:4], (1,2))
+					# dim of state!
+					# state = np.reshape(state[2:4], (1,2))
+					state = np.reshape(state,(1,4))
 					action = agent.get_action(state)
 					# print("action: {}".format(action))
 					state_, reward, done, info = env.step(action[0])
@@ -100,6 +104,7 @@ def main():
 					state = state_
 					total_reward += reward
 					if done:
+						print("x: {}".format(state_[0]))
 						history.append(total_reward)
 						# print("i_episode_steps {}".format(i_episode_steps))
 						# print("total_reward {}".format(total_reward))
@@ -114,7 +119,7 @@ def main():
 		sample_meanmean.append(np.mean(test_mean))
 		print("\ntest_mean {}\n".format(np.mean(test_mean)))
 		sample_meanmax.append(np.mean(test_max))
-		sample_meanmin.append(np.mean(test_min))	
+		sample_meanmin.append(np.mean(test_min))
 
 
 	print(sample_meanmean)

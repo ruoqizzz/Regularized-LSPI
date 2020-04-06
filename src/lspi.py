@@ -34,12 +34,13 @@ class LSPIAgent(object):
 	def train(self, samples):
 		# states = samples[0]
 		# print(states[:,2:])
-		states = samples[0][:,2:]
+		# states = samples[0][:,2:]
+		states = samples[0]
 		actions = samples[1]
 		# rewards = samples[2]
 		rewards = -(states[:,0]**2)
 		# next_states = samples[3]
-		next_states = samples[3][:,2:]
+		next_states = samples[3]
 		dones = samples[4]
 
 		phi = self.policy.basis_func.evaluate(states, actions)
@@ -70,8 +71,29 @@ class LSPIAgent(object):
 				clf = linear_model.Lasso(alpha=self.reg_param, max_iter=50000)
 				clf.fit(A, b)
 				new_weights = clf.coef_
-			if self.opt == 'l2':
+			elif self.opt == 'l2':
 				new_weights = np.linalg.solve(A,b)
+			elif self.opt == 'wl1':
+				# TODO: test
+				NUM_RUNS = 15
+
+				n = A.shape[1]
+				new_weights = cp.Variable(n)
+				lambdas = np.sqrt(np.diag(A.T@A)/n)
+				lambdas = np.diag(lambdas)
+				# set up problem
+
+				obj = cp.Minimize(cp.norm(b-A@new_weights) + cp.norm(lambdas@new_weights, 1))
+				prob = cp.Problem(obj)
+				try:
+
+					prob.solve(verbose=True)
+				except cp.error.SolverError:
+					prob.solve(solver=cp.SCS)
+				new_weights = new_weights.value
+
+			else:
+				assert ValueError("wrong option")
 			error = np.linalg.norm(self.policy.weights-new_weights)
 			print("error when update_weights in iteration {}: {}".format(i_iter,error))
 			if len(error_his)>2:
