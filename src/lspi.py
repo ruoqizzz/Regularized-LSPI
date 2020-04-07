@@ -38,7 +38,7 @@ class LSPIAgent(object):
 		states = samples[0]
 		actions = samples[1]
 		# rewards = samples[2]
-		rewards = -(states[:,0]**2)
+		rewards = -(states[:,2]**2 + states[:,0]**2)
 		# next_states = samples[3]
 		next_states = samples[3]
 		dones = samples[4]

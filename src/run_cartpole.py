@@ -26,7 +26,8 @@ def main():
 	parser.add_argument('--update_freq', default=1000, type=int)
 	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2","wl1"])
 	parser.add_argument('--reg_param', default=0.0001, type=float)
-	parser.add_argument('--rbf_sigma', default=1.0, type=float)
+	parser.add_argument('--rbf_sigma', default=0.5, type=float)
+	parser.add_argument('--lspi_iteration', default=100, type=int)
 	
 	args = parser.parse_args()
 	params = vars(args)
@@ -39,7 +40,7 @@ def main():
 	n_episode = params['episode_num']
 	gamma = params['weight_discount']
 	n_features = params['basis_function_dim']
-
+	lspi_iteration = params['lspi_iteration']
 
 	params['n_actions'] = env.action_space.n
 	params['state_dim'] = env.observation_space.shape[0]
@@ -75,7 +76,7 @@ def main():
 			params['basis_func'] = basis_func
 			policy = GreedyPolicy(params['basis_func'], params['n_actions'], 1-params['exploration'])
 			params['policy'] = policy
-			agent = LSPIAgent(params)
+			agent = LSPIAgent(params, n_iter_max=lspi_iteration)
 			for i in range(1):
 				print("agent training {} times".format(i))
 				agent.train(i_samples)
