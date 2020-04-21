@@ -38,13 +38,14 @@ class LSPIAgent(object):
 		states = samples[0]
 		actions = samples[1]
 		# rewards = samples[2]
-		rewards = -(states[:,2]**2 + states[:,0]**2)
+		# rewards = -(states[:,2]**2 + states[:,0]**2)
+		rewards = -(states[:,2]**2)
 		# next_states = samples[3]
 		next_states = samples[3]
 		dones = samples[4]
-
+		
 		phi = self.policy.basis_func.evaluate(states, actions)
-
+		print("shape of phi: ", phi.shape)
 		error = float('inf')
 		error_his = []
 		i_iter = 0
@@ -55,6 +56,7 @@ class LSPIAgent(object):
 			# print((self.policy.basis_func.evaluate(next_states, next_actions)*(1-dones).reshape(len(dones),1))[:10])
 			# print(np.array(dones).astype(float))
 			next_phi = self.policy.basis_func.evaluate(next_states, next_actions)
+			print("shape of next_phi: ", next_phi.shape)
 			# *(1.0-np.array(dones).astype(float)).reshape(len(dones),1)
 			A = 1/states.shape[0]*phi.T@(phi-self.gamma*next_phi) 
 			# print("A: {}".format(A))
@@ -66,7 +68,8 @@ class LSPIAgent(object):
 			# A = 1/states.shape[0]* A
 			b = 1/states.shape[0]*phi.T@rewards
 			# print("b: {}".format(b))
-			
+			print("shape of b: ", b.shape)
+			print("shape of A: ", A.shape)
 			if self.opt == 'l1':
 				clf = linear_model.Lasso(alpha=self.reg_param, max_iter=50000)
 				clf.fit(A, b)
@@ -75,23 +78,38 @@ class LSPIAgent(object):
 				new_weights = np.linalg.solve(A,b)
 			elif self.opt == 'wl1':
 				# TODO: test
-				NUM_RUNS = 15
-
 				n = A.shape[1]
 				new_weights = cp.Variable(n)
-				lambdas = np.sqrt(np.diag(A.T@A)/n)
+				lambdas = np.sqrt(np.diag(A.T@A)/A.shape[0])
 				lambdas = np.diag(lambdas)
-				# set up problem
 
-				obj = cp.Minimize(cp.norm(b-A@new_weights) + cp.norm(lambdas@new_weights, 1))
-				prob = cp.Problem(obj)
-				try:
+				w = np.zeros(A.shape[1])
+				# weights_his = []
+				
+				k=0
+				ifChange = True
+				while(ifChange):
+					ifChange = False
+					for i in range(n):
+						# get w/i 
+						bi_hat = b-(A@w - w[i]*A[:,i])
+						l_i = lambdas[i,i]
+						r_i = abs(w[i])
+						alpha_i = np.linalg.norm(bi_hat, ord=2)**2
+						beta_i = np.linalg.norm(A[:,i], ord=2)**2
+						g_i = A[:,i].T@bi_hat
+						r_i_hat = 0
+						if alpha_i*(l_i**2)<g_i**2:
+							r_i_hat = abs(g_i)/beta_i - l_i/(beta_i*np.sqrt(beta_i-l_i**2))*np.sqrt(alpha_i*beta_i-g_i**2)
+				#         if w[i]-np.sign(g_i)*r_i_hat>10e-20:
+						old_wi = w[i]
+						w[i] = np.sign(g_i)*r_i_hat
+						if w[i]-old_wi>10e-5:
+							ifChange = True
 
-					prob.solve(verbose=True)
-				except cp.error.SolverError:
-					prob.solve(solver=cp.SCS)
-				new_weights = new_weights.value
-
+					k+=1
+					print(k)
+					# weights_his.append(w)
 			else:
 				assert ValueError("wrong option")
 			error = np.linalg.norm(self.policy.weights-new_weights)
