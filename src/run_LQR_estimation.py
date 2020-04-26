@@ -32,12 +32,12 @@ def main():
 	parser.add_argument('--env_name', default="LQR", choices=["cliff-v0","CartPole-v0","inverted_pedulum","LQR","chain"])	# gym env to train
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
-	parser.add_argument('--basis_function_dim', default=20, type=int)
+	parser.add_argument('--basis_function_dim', default=40, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
 	parser.add_argument('--sample_max_steps', default="2000", choices=["2000","5000"])
 	parser.add_argument('--max_steps', default=500, type=int)
 	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2"])
-	parser.add_argument('--reg_param', default=0.001, type=float)
+	parser.add_argument('--reg_param', default=0.01, type=float)
 	parser.add_argument('--rbf_sigma', default=0.01, type=float)
 	# parser.add_argument('--batch_size', default=2000, type=int)
 	parser.add_argument('--L', default=0.1, type=float)	# 0.0 means no random action
@@ -97,22 +97,22 @@ def main():
 		# print("q_true: {}".format(q_true))
 		q_true_his.append(q_true)
 
-	# true_weights_scala = env.true_weights_scala(L, gamma)
-	# print("true_weights_scala: {}".format(true_weights_scala))
-	# estimate_weights = agent.policy.weights
-	# print("estimate_weights: {}".format(estimate_weights))
-	# true_estimate_error = np.linalg.norm(true_weights_scala-estimate_weights)
-	# print("true_estimate_error: {}".format(true_estimate_error))
+	true_weights_scala = env.true_weights_scala(L, gamma)
+	print("true_weights_scala: {}".format(true_weights_scala))
+	estimate_weights = agent.policy.weights
+	print("estimate_weights: {}".format(estimate_weights))
+	true_estimate_error = np.linalg.norm(true_weights_scala-estimate_weights)
+	print("true_estimate_error: {}".format(true_estimate_error))
 
-	now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
+	# now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
 
 	# save data to file
 	# note .item() only for one element
-	dirname = "data/Estimation/state=" + str(state.item())+"/"
-	try:
-		os.mkdir(dirname)
-	except OSError as error:  
-		print(error)
+	# dirname = "data/Estimation/state=" + str(state.item())+"/"
+	# try:
+	# 	os.mkdir(dirname)
+	# except OSError as error:  
+	# 	print(error)
 
 	# # save q_true
 	# filename = dirname + "q_true.pickle"
@@ -165,11 +165,11 @@ def main():
 	now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
 
 	# save estimate data to file
-	dirname = "data/Estimation/states[" + str(state_low)+","+str(state_high)+"]/"
-	try:  
-		os.mkdir(dirname)
-	except OSError as error:
-		print(error)  
+	# dirname = "data/Estimation/states[" + str(state_low)+","+str(state_high)+"]/"
+	# try:  
+	# 	os.mkdir(dirname)
+	# except OSError as error:
+	# 	print(error)  
 	# # q_true
 	# filename = dirname + "q_true.pickle"
 	# f = open(filename, 'wb')

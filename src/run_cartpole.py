@@ -20,11 +20,11 @@ def main():
 	parser.add_argument('--episode_num', default=1000, type=int)
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
-	parser.add_argument('--basis_function_dim', default=20, type=int)
+	parser.add_argument('--basis_function_dim', default=400, type=int)
 	parser.add_argument('--stop_criterion', default=10**-3, type=float)
 	parser.add_argument('--batch_size', default=1000, type=int)
 	parser.add_argument('--update_freq', default=1000, type=int)
-	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2","wl1"])
+	parser.add_argument('--reg_opt', default="wl1", choices=["l1","l2","wl1"])
 	parser.add_argument('--reg_param', default=0.0001, type=float)
 	parser.add_argument('--rbf_sigma', default=0.5, type=float)
 	parser.add_argument('--lspi_iteration', default=100, type=int)
@@ -60,7 +60,7 @@ def main():
 	sample_meanmean = []
 	sample_meanmax = []
 	sample_meanmin = []
-	for i_s in range(4,len(rbs)):
+	for i_s in range(len(rbs)):
 		print("===================================")
 		print("sample {}\n".format(num[i_s]))
 		i_samples = rbs[i_s].sample(rbs[i_s].num_buffer)
@@ -105,7 +105,7 @@ def main():
 					state = state_
 					total_reward += reward
 					if done:
-						print("x: {}".format(state_[0]))
+						# print("x: {}".format(state_[0]))
 						history.append(total_reward)
 						# print("i_episode_steps {}".format(i_episode_steps))
 						# print("total_reward {}".format(total_reward))

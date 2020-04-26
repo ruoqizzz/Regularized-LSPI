@@ -21,6 +21,8 @@ Src/images/*
 *.png
 *.jpg
 
+# Videos
+src/videos/*
 # output log
 *.txt
 

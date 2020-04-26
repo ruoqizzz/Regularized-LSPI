@@ -152,7 +152,7 @@ class ExactPolicy4LQR(object):
 	def get_action_with_L(self, states):
 		actions = []
 		for s in states:	
-			action = - self.L * state
+			action = - self.L * s
 			# print("action: {}".format(action))
 			actions.append(action)
 		return np.array(actions)
