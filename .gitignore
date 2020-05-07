@@ -32,6 +32,9 @@ src/data
 # debug file
 debug*
 
+# test file
+src/test/
+
 # samples
 src/samples/LQR/
 !src/samples/LQR/gaussian_actions_2000_2.pickle

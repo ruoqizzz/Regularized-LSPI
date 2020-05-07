@@ -36,7 +36,7 @@ def main():
 	parser.add_argument('--batch_size', default=2000, type=int)
 	parser.add_argument('--update_freq', default=10000000, type=int)
 	parser.add_argument('--L', default=0.1, type=float)	# 0.0 means no random action
-	parser.add_argument('--reg_opt', default="l1", choices=["l1","l2"])
+	parser.add_argument('--reg_opt', default="l1", choices=["l1","l2", "wl1"])
 	parser.add_argument('--reg_param', default=0.01, type=float)
 	
 	args = parser.parse_args()
@@ -117,8 +117,11 @@ def main():
 	# plot 
 	# plt.plot(reward_his)
 	# plt.show()
-	plt.plot(np.arange(n_episode), estimateL_his)
-	plt.plot(np.arange(n_episode), [trueL]*n_episode)
+	plt.plot(np.arange(n_episode), estimateL_his, label='estimate policy')
+	plt.plot(np.arange(n_episode), [trueL]*n_episode, label='optimal policy')
+	plt.ylabel('policy')
+	plt.xlabel('episode')
+	plt.legend(loc='upper right')
 	plt.show()
 
 if __name__ == '__main__':

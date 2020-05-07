@@ -31,7 +31,7 @@ def main():
 	parser.add_argument('--stop_criterion', default=10**-3, type=float)
 	parser.add_argument('--sample_max_steps', default="2000", choices=["2000","5000","10000","20000"])
 	parser.add_argument('--max_steps', default=20, type=int)
-	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2"])
+	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2", "wl1"])
 	parser.add_argument('--reg_param', default=0.001, type=float)
 	parser.add_argument('--rbf_sigma', default=0.01, type=float)
 	# parser.add_argument('--batch_size', default=2000, type=int)
@@ -85,7 +85,7 @@ def main():
 	# save agent
 	
 	now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
-	fn = "data/agent/agent-"+str(params['reg_opt'])+"-"+str(params['reg_param'])+"-BF"+str(n_features)+".pkl"
+	fn = "data/agent/agent-"+str(params['reg_opt'])+"-"+str(params['reg_param'])+"-BF"+str(n_features)+now+".pkl"
 	f = open(fn, 'wb')
 	pickle.dump(agent, f)
 	f.close()

@@ -34,18 +34,21 @@ class LSPIAgent(object):
 
 	def train(self, samples):
 		# states = samples[0]
-		# print(states[:,2:])
-		# states = samples[0][:,2:]
+		# reshape states
+		states = samples[0][:,2:]
 		# print(states.shape)
-		states = samples[0]
 		actions = samples[1]
+		
 		# rewards = samples[2]
-		rewards = -(states[:,2]**2 + states[:,0]**2)
+		# reshape rewards
+		# rewards = -(states[:,2]**2 + states[:,0]**2)
 		# rewards = -(states[:,2]**2)
-		# rewards = -(states[:,0]**2)
+		rewards = -(states[:,0]**2)
 		# print(rewards.shape)
-		next_states = samples[3]
-		# next_states = samples[3][:,2:]
+
+		# reshape next states
+		# next_states = samples[3]
+		next_states = samples[3][:,2:]
 		dones = samples[4]
 		
 		phi = self.policy.basis_func.evaluate(states, actions)
@@ -61,34 +64,34 @@ class LSPIAgent(object):
 			# print(np.array(dones).astype(float))
 			next_phi = self.policy.basis_func.evaluate(next_states, next_actions)
 			# print("shape of next_phi: ", next_phi.shape)
-			# *(1.0-np.array(dones).astype(float)).reshape(len(dones),1)
-			A = 1/states.shape[0]*phi.T@(phi-self.gamma*next_phi) 
+
+			# print("number of samples: ",states.shape[0])
+			A = phi.T@(phi-self.gamma*next_phi)
+			A = A/A.shape[0] 
+			b = phi.T@rewards
+			b = b/A.shape[0]
 			# print("A: {}".format(A))
-			if self.opt=='l2':
-				A += self.reg_param*np.identity(A.shape[0])
-			else:
-				A += 0.0001*np.identity(A.shape[0])
-			# 1/states.shape[0]
-			# A = 1/states.shape[0]* A
-			b = 1/states.shape[0]*phi.T@rewards
 			# print("b: {}".format(b))
 			# print("shape of b: ", b.shape)
 			# print("shape of A: ", A.shape)
-			if self.opt == 'l1':
-				clf = linear_model.Lasso(alpha=self.reg_param, max_iter=50000)
+			if self.opt == 'none':
+				new_weights = np.linalg.pinv(A)@b
+			elif self.opt == 'l1':
+				clf = linear_model.Lasso(alpha=self.reg_param/A.shape[0], max_iter=50000)
 				clf.fit(A, b)
 				new_weights = clf.coef_
 			elif self.opt == 'l2':
-				new_weights = np.linalg.solve(A,b)
+				new_weights = np.linalg.solve(A+self.reg_param/A.shape[0]*np.identity(A.shape[0]),b)
 			elif self.opt == 'wl1':
 				# TODO: test
 				n = A.shape[1]
-				lambdas = np.sqrt(np.diag(A.T@A)/A.shape[0])
-				lambdas = np.diag(lambdas)
+				lambdas = np.sqrt(np.diag(phi.T@phi)/A.shape[0])
+				lambdas = 0.01*np.diag(lambdas)
 				if self.old_weights is None:
 					new_weights = np.zeros(A.shape[1])
 				else:
 					new_weights = self.old_weights
+				# new_weights = np.zeros(A.shape[1])
 				# weights_his = []
 				T = A.T@A
 				kepa = np.linalg.norm(b, ord=2)**2
@@ -119,6 +122,7 @@ class LSPIAgent(object):
 					k+=1
 					# print(k)
 					self.old_weights = new_weights
+					# print("weights: ",new_weights)
 					# weights_his.append(w)
 			else:
 				assert ValueError("wrong option")

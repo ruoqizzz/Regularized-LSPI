@@ -3,7 +3,6 @@ import argparse
 from lspi import LSPIAgent
 from replay_buffer import ReplayBuffer
 import gym
-import gymgrid
 from env.inverted_pendulum import InvertedPendulumEnv
 from env.linear_quadratic_regulator import LQREnv
 from env.chain import ChainEnv
@@ -17,27 +16,28 @@ from gym import wrappers
 
 def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--env_name', default="CartPole-v0", choices=["cliff-v0","CartPole-v0","inverted_pedulum","chain"])	# gym env to train
+	# parser.add_argument('--env_name', default="CartPole-v0", choices=["cliff-v0","CartPole-v0","inverted_pedulum","chain"])	# gym env to train
 	parser.add_argument('--episode_num', default=1000, type=int)
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
 	parser.add_argument('--basis_function_dim', default=200, type=int)
 	parser.add_argument('--stop_criterion', default=10**-3, type=float)
-	parser.add_argument('--batch_size', default=1000, type=int)
-	parser.add_argument('--update_freq', default=1000, type=int)
+	# parser.add_argument('--batch_size', default=1000, type=int)
+	# parser.add_argument('--update_freq', default=1000, type=int)
+	parser.add_argument('--samples_episodes', default="1000", choices=["200","400","600","1000"])
 	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2","wl1"])
-	parser.add_argument('--reg_param', default=0.0001, type=float)
+	parser.add_argument('--reg_param', default=0.04, type=float)
 	parser.add_argument('--rbf_sigma', default=0.5, type=float)
 	parser.add_argument('--lspi_iteration', default=100, type=int)
 	
 	args = parser.parse_args()
 	params = vars(args)
 
-	env = gym.make(params['env_name'])
+	env = gym.make('CartPole-v0')
 
 	# set the parameters for agent
-	batch_size = params['batch_size']
-	update_freq = params['update_freq']
+	# batch_size = params['batch_size']
+	# update_freq = params['update_freq']
 	n_episode = params['episode_num']
 	gamma = params['weight_discount']
 	n_features = params['basis_function_dim']
@@ -46,12 +46,13 @@ def main():
 	params['n_actions'] = env.action_space.n
 	params['state_dim'] = env.observation_space.shape[0]
 
-	fn = "samples/CartPole/reward_shape/CartPole"+str(1000)+".pickle"
+	samples_episodes = params['samples_episodes']
+	fn = "samples/CartPole/reward_shape/CartPole"+samples_episodes+".pickle"
 	f = open(fn, 'rb')
 	replay_buffer = pickle.load(f)
 	f.close()
-	# basis_func = RBF(params['state_dim']-2, n_features, params['n_actions'], params['rbf_sigma'], high=np.array([0.21,2.7]))
-	basis_func = RBF(params['state_dim'], n_features, params['n_actions'], params['rbf_sigma'], high=np.array([2.5,3,0.21,2.7]))
+	basis_func = RBF(params['state_dim']-2, n_features, params['n_actions'], params['rbf_sigma'], high=np.array([0.21,2.7]))
+	# basis_func = RBF(params['state_dim'], n_features, params['n_actions'], params['rbf_sigma'], high=np.array([2.5,3,0.21,2.7]))
 	params['basis_func'] = basis_func
 	policy = GreedyPolicy(params['basis_func'], params['n_actions'], 1-params['exploration'])
 	params['policy'] = policy
@@ -69,8 +70,8 @@ def main():
 	while True:
 		# env.render()
 		# dim of state!
-		# state = np.reshape(state[2:4], (1,2))
-		state = np.reshape(state,(1,4))
+		state = np.reshape(state[2:4], (1,2))
+		# state = np.reshape(state,(1,4))
 		action = agent.get_action(state)
 		# print("action: {}".format(action))
 		state_, reward, done, info = env.step(action[0])

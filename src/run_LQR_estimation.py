@@ -34,10 +34,10 @@ def main():
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
 	parser.add_argument('--basis_function_dim', default=40, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
-	parser.add_argument('--sample_max_steps', default="2000", choices=["2000","5000"])
+	parser.add_argument('--sample_max_steps', default="5000", choices=["2000","5000"])
 	parser.add_argument('--max_steps', default=500, type=int)
-	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2"])
-	parser.add_argument('--reg_param', default=0.01, type=float)
+	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2", "wl1"])
+	parser.add_argument('--reg_param', default=0.001, type=float)
 	parser.add_argument('--rbf_sigma', default=0.01, type=float)
 	# parser.add_argument('--batch_size', default=2000, type=int)
 	parser.add_argument('--L', default=0.1, type=float)	# 0.0 means no random action
@@ -77,140 +77,79 @@ def main():
 	error_list, new_weights = agent.train(samples)
 
 
-	true_estimate_error_history = []
-	q_true_his = []
-	q_estimate_his = []
-
 
 	# for specific state
 	# range of action
-	state = np.matrix(-1.)
-	actions = np.linspace(-6,6, 100)
+	for si in range(-10,10):
+		true_estimate_error_history = []
+		q_true_his = []
+		q_estimate_his = []
 
-	q_estimate_his = agent.policy.q_state_action_func(np.full(len(actions), state), actions)
-	for i in range(len(actions)):
-		action = np.matrix(actions[i])
-		# q_estimate = agent.policy.q_state_action_func(state, action)[0]
-		# q_estimate_his.append(q_estimate)
-		# print("q_estimate: {}".format(q_estimate))
-		q_true = env.true_Qvalue(L, gamma, state, action)
-		# print("q_true: {}".format(q_true))
-		q_true_his.append(q_true)
+		state = np.matrix(si)
+		actions = np.linspace(-6,6, 100)
 
-	true_weights_scala = env.true_weights_scala(L, gamma)
-	print("true_weights_scala: {}".format(true_weights_scala))
-	estimate_weights = agent.policy.weights
-	print("estimate_weights: {}".format(estimate_weights))
-	true_estimate_error = np.linalg.norm(true_weights_scala-estimate_weights)
-	print("true_estimate_error: {}".format(true_estimate_error))
+		q_estimate_his = agent.policy.q_state_action_func(np.full(len(actions), state), actions)
+		for i in range(len(actions)):
+			action = np.matrix(actions[i])
+			# q_estimate = agent.policy.q_state_action_func(state, action)[0]
+			# q_estimate_his.append(q_estimate)
+			# print("q_estimate: {}".format(q_estimate))
+			q_true = env.true_Qvalue(L, gamma, state, action)
+			# print("q_true: {}".format(q_true))
+			q_true_his.append(q_true)
 
-	# now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
+		true_weights_scala = env.true_weights_scala(L, gamma)
+		print("true_weights_scala: {}".format(true_weights_scala))
+		estimate_weights = agent.policy.weights
+		print("estimate_weights: {}".format(estimate_weights))
+		true_estimate_error = np.linalg.norm(true_weights_scala-estimate_weights)
+		print("true_estimate_error: {}".format(true_estimate_error))
 
-	# save data to file
-	# note .item() only for one element
-	# dirname = "data/Estimation/state=" + str(state.item())+"/"
-	# try:
-	# 	os.mkdir(dirname)
-	# except OSError as error:  
-	# 	print(error)
+		# now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
 
-	# # save q_true
-	# filename = dirname + "q_true.pickle"
-	# f = open(filename, 'wb')
-	# pickle.dump(q_true_his, f)
-	# f.close()
-	# save q_estimate
+		# save data to file
+		# note .item() only for one element
+		# dirname = "data/Estimation/state=" + str(state.item())+"/"
+		# try:
+		# 	os.mkdir(dirname)
+		# except OSError as error:  
+		# 	print(error)
 
-	# if params['basis_func'].name()[:3] == 'RBF':
-	# 	filename = dirname + params['basis_func'].name()+"-"+str(params['basis_function_dim'])+"-"+params['reg_opt']+"-"+str(params['reg_param'])+".pickle"
-	# else:
-	# 	filename = dirname + params['basis_func'].name()+".pickle"
-	# f1 = open(filename, 'wb')
-	# pickle.dump(q_estimate_his, f1)
-	# f1.close()
+		# # save q_true
+		# filename = dirname + "q_true.pickle"
+		# f = open(filename, 'wb')
+		# pickle.dump(q_true_his, f)
+		# f.close()
+		# save q_estimate
 
-	print("q_estimate_his: {}".format(q_estimate_his))
-	plt.figure(figsize=(8, 6))
-	plt.subplot(211)
-	plt.plot(actions, q_estimate_his)
-	plt.title('q estimate')
+		# if params['basis_func'].name()[:3] == 'RBF':
+		# 	filename = dirname + params['basis_func'].name()+"-"+str(params['basis_function_dim'])+"-"+params['reg_opt']+"-"+str(params['reg_param'])+".pickle"
+		# else:
+		# 	filename = dirname + params['basis_func'].name()+".pickle"
+		# f1 = open(filename, 'wb')
+		# pickle.dump(q_estimate_his, f1)
+		# f1.close()
 
-	plt.subplot(212)
-	plt.plot(actions, q_true_his)
-	plt.title('q true')
-	# plt.savefig("images/rbf-lqr/"+str(n_features)+"-"+now+"q_true&estimate-action(-1,1)")
-	plt.show()
+		qe_index = np.argmax(q_estimate_his)
+		qt_index = np.argmax(q_true_his)
 
+		plt.figure(figsize=(10, 8))
+		plt.subplot(211)
+		ax = plt.gca()
+		plt.plot(actions, q_estimate_his)
+		plt.scatter(actions[qe_index], q_estimate_his[qe_index], c='r')
+		plt.xlabel('actions')
+		plt.ylabel('q value')
+		plt.title('estimate q value')
+		ax.xaxis.set_label_coords(1.02, -0.035)
+		plt.subplot(212)
+		plt.plot(actions, q_true_his)
+		plt.scatter(actions[qt_index], q_true_his[qt_index], c='r')
 
-	# for state range
-	state_low = -10.0
-	state_high = 10.0
-	states = np.linspace(state_low, state_high, 100)
-	actions = -L.item()*states
-
-	# true_weights_scala_his = []
-	true_estimate_error_history = []
-	q_true_his = []
-	q_estimate_his = agent.policy.q_state_action_func(states, actions)
-
-	for i in range(len(states)):
-		state = np.matrix(states[i])
-		# action = -L*state
-		# actions.append(action.item())
-		q_true = env.true_Qvalue(L, gamma, state, action)
-		# q_state = env.true_Qvalue_state(L, gamma, state)
-		q_true_his.append(q_true)
-
-
-	now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
-
-	# save estimate data to file
-	# dirname = "data/Estimation/states[" + str(state_low)+","+str(state_high)+"]/"
-	# try:  
-	# 	os.mkdir(dirname)
-	# except OSError as error:
-	# 	print(error)  
-	# # q_true
-	# filename = dirname + "q_true.pickle"
-	# f = open(filename, 'wb')
-	# pickle.dump(q_true_his, f)
-	# f.close()
-
-	# estimate
-	# if params['basis_func'].name()[:3]=='RBF':
-	# 	filename = dirname + params['basis_func'].name()+"-"+str(params['basis_function_dim'])+"-"+params['reg_opt']+"-"+str(params['reg_param'])+".pickle"
-	# else:
-	# 	filename = dirname + params['basis_func'].name()+".pickle"
-	# f1 = open(filename, 'wb')
-	# pickle.dump(q_estimate_his, f1)
-	# f1.close()
-
-	# plot
-	plt.figure(figsize=(10, 10))
-	plt.title('state from -2 to 2 and action(-L*state)')
-	plt.subplot(411)
-	plt.plot(states)
-	plt.title('state')
-
-	plt.subplot(412)
-	plt.plot(actions)
-	plt.title('actions')
-	# plt.show()
-
-	plt.subplot(413)
-	plt.plot(states, q_true_his)
-	plt.title('true Q')
-	# plt.show()
-
-	plt.subplot(414)
-	plt.plot(states, q_estimate_his)
-	plt.title('estimate Q')
-	# plt.savefig(now+"q_true&estimate-state(-2,2)")
-	# plt.show()
-
-
-	# plt.savefig("images/rbf-lqr/L2/20-"+str(n_features)+"-"+now+"q_true&estimate-state(-2,2)")
-	plt.show()
+		plt.title('true q value')
+		# plt.savefig("images/rbf-lqr/"+str(n_features)+"-"+now+"q_true&estimate-action(-1,1)")
+		plt.show()
+		
 
 	env.close()
 	replay_buffer.reset()

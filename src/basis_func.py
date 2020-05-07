@@ -31,6 +31,7 @@ class RBF(object):
 			offset = (self.n_features)*actions[i]
 			phi[i, offset] = 1
 			rbfs = np.exp(-self.sigma*np.linalg.norm(states[i] - self.feature_means[actions[i]], axis=1)**2)
+			print("rbfs.shape: ", rbfs.shape)
 			phi[i, offset+1:offset+self.n_features] = rbfs
 		return phi
 
@@ -71,6 +72,7 @@ class RBF_LQR(object):
 			phi[i,0] = 1
 			rbf = np.exp(-self.sigma*(np.linalg.norm(states[i] - self.state_means, axis=1)**2+np.linalg.norm(actions[i] - self.action_means, axis=1)**2))
 			phi[i,1:] = rbf
+			# print("rbf.shape: ". rbf.shape)
 		return phi
 
 	def name(self):
