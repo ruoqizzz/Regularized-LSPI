@@ -159,11 +159,11 @@ class LQREnv(object):
 
 if __name__ == '__main__':
 	# test env for 2d
-	A = np.matrix([[0.5,1],[0,0.9]])
-	B = np.matrix([[0],[1]])
-	Z1 = np.matrix([[1,0],[0,0]])
+	A = np.matrix([[0.9,0.],[0.1,0.9]])
+	B = np.matrix([[1],[0.]])
+	Z1 = np.matrix([[0,0],[0,1]])
 	Z2 = 0.1
-	noise_cov = np.matrix([[0.1,0],[0.1,1]])
+	noise_cov = np.matrix([[0.01,0],[0,0.01]])
 	env = LQREnv(A=A,B=B,Z1=Z1,Z2=Z2,noise_cov=noise_cov)
 	state = env.reset()
 	action = np.matrix(mb.rand(env.n,env.n))

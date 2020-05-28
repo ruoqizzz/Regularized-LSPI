@@ -27,7 +27,6 @@ def main():
 	parser.add_argument('--basis_function_dim', default=40, type=int)
 	parser.add_argument('--stop_criterion', default=10**-3, type=float)
 	parser.add_argument('--sample_max_steps', default="2000", choices=["2000","5000","10000","20000"])
-	parser.add_argument('--max_steps', default=20, type=int)
 	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2", "wl1", "none"])
 	parser.add_argument('--reg_param', default=0.001, type=float)
 	parser.add_argument('--rbf_sigma', default=0.01, type=float)
@@ -59,7 +58,6 @@ def main():
 	# params['basis_func'] = ExactBasis4LQR()
 
 	batch_size = params['sample_max_steps']
-	max_steps = params['max_steps']
 	sample_filename = LQR2D_samples_filename[params['sample_max_steps']]
 	# sample_filename = LQR_samples_filename["-22-10000"]
 	f = open(sample_filename, 'rb')
@@ -80,7 +78,7 @@ def main():
 	error_list, new_weights = agent.train(sample)
 
 	# states = np.linspace(-10,10,500)
-	states = np.linspace([-7]*env.m, [7]*env.m, 1000)
+	states = np.linspace([-4]*env.m, [4]*env.m, 1000)
 	trueL = env.optimal_policy_L(gamma)
 	print(states)
 	print(trueL)
