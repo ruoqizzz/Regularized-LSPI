@@ -4,7 +4,6 @@ import argparse
 from lspi import LSPIAgent
 from replay_buffer import ReplayBuffer
 import gym
-import gymgrid
 from env.linear_quadratic_regulator import LQREnv
 from basis_func import *
 import time

@@ -4,7 +4,6 @@ import argparse
 from lspi import LSPIAgent
 from replay_buffer import ReplayBuffer
 import gym
-import gymgrid
 from env.linear_quadratic_regulator import LQREnv
 from basis_func import *
 import time
@@ -16,17 +15,15 @@ import time
 
 # sample data files name for LQR
 LQR_samples_filename = {
-	2000: "samples/LQR/gaussian_actions_2000_2.pickle",
-	5000: "samples/LQR/gaussian_actions_5000.pickle",
-	10000: "samples/LQR/gaussian_actions_10000.pickle",
-	20000: "samples/LQR/gaussian_actions_20000.pickle",
+	2000: "samples/LQR/gaussian_actions_2000.pickle",
+	5000: "samples/LQR/gaussian_actions_5000.pickle"
 }
 
 
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--env_name', default="LQR", choices=["cliff-v0","CartPole-v0","inverted_pedulum","LQR","chain"])	# gym env to train
-	parser.add_argument('--episode_num', default=20, type=int)
+	parser.add_argument('--episode_num', default=10, type=int)
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
 	parser.add_argument('--basis_function_dim', default=10, type=int)
@@ -36,7 +33,7 @@ def main():
 	parser.add_argument('--batch_size', default=2000, type=int)
 	parser.add_argument('--update_freq', default=10000000, type=int)
 	parser.add_argument('--L', default=0.1, type=float)	# 0.0 means no random action
-	parser.add_argument('--reg_opt', default="l1", choices=["l1","l2", "wl1"])
+	parser.add_argument('--reg_opt', default="none", choices=["l1","l2", "wl1", "none"])
 	parser.add_argument('--reg_param', default=0.01, type=float)
 	
 	args = parser.parse_args()
@@ -111,15 +108,16 @@ def main():
 	# now = time.strftime("%Y-%m-%d-%H_%M_%S",time.localtime(time.time())) 
 	trueL = env.optimal_policy_L(gamma).item()
 	print("trueL: {}".format(trueL))
+	print("estimateL_his: {}",estimateL_his)
 	env.close()
 	replay_buffer.reset()
 
 	# plot 
 	# plt.plot(reward_his)
 	# plt.show()
-	plt.plot(np.arange(n_episode), estimateL_his, label='estimate policy')
-	plt.plot(np.arange(n_episode), [trueL]*n_episode, label='optimal policy')
-	plt.ylabel('policy')
+	plt.plot(np.arange(n_episode), estimateL_his, label='estimate L')
+	plt.plot(np.arange(n_episode), [trueL]*n_episode, label='optimal L')
+	plt.ylabel('L')
 	plt.xlabel('episode')
 	plt.legend(loc='upper right')
 	plt.show()

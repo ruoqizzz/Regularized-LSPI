@@ -7,7 +7,6 @@ import argparse
 from lspi import LSPIAgent
 from replay_buffer import ReplayBuffer
 import gym
-import gymgrid
 from env.linear_quadratic_regulator import LQREnv
 from basis_func import *
 import time
@@ -29,14 +28,13 @@ LQR_samples_filename = {
 def main():
 
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--env_name', default="LQR", choices=["cliff-v0","CartPole-v0","inverted_pedulum","LQR","chain"])	# gym env to train
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
 	parser.add_argument('--basis_function_dim', default=40, type=int)
 	parser.add_argument('--stop_criterion', default=10**-5, type=float)
 	parser.add_argument('--sample_max_steps', default="5000", choices=["2000","5000"])
 	parser.add_argument('--max_steps', default=500, type=int)
-	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2", "wl1"])
+	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2", "wl1", "none"])
 	parser.add_argument('--reg_param', default=0.001, type=float)
 	parser.add_argument('--rbf_sigma', default=0.01, type=float)
 	# parser.add_argument('--batch_size', default=2000, type=int)
@@ -80,7 +78,8 @@ def main():
 
 	# for specific state
 	# range of action
-	for si in range(-10,10):
+	for si in range(-10,10,5):
+		si = -1.0
 		true_estimate_error_history = []
 		q_true_his = []
 		q_estimate_his = []

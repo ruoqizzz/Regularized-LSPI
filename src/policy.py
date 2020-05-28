@@ -53,7 +53,7 @@ class RBFPolicy4LQR(object):
 	"""docstring for ExactPolicy4LQR"""
 	def __init__(self, basis_func, L = None):
 		super(RBFPolicy4LQR, self).__init__()
-		if L==None:
+		if L is None:
 			self.get_action_training = self.get_best_action
 		else:
 			self.L = L
@@ -63,6 +63,7 @@ class RBFPolicy4LQR(object):
 		self.basis_func = basis_func
 		n = basis_func.size()
 		self.weights = np.random.randn(n)
+		# print("len(weights)",len(self.weights))
 		# use the best L 
 		self.get_action_iteracting = self.get_best_action
 
@@ -77,13 +78,13 @@ class RBFPolicy4LQR(object):
 
 
 	def get_best_action(self, states):
-		actions = np.linspace(-6,6,100)
+		actions = np.linspace(-3,3,201)
 		Q_values = np.zeros((states.shape[0], len(actions)))
 
 		for i in range(len(actions)):
 			Qa = self.q_state_action_func(states, np.full(states.shape[0], actions[i], np.float))
 			Q_values[:, i] = Qa
-		print("argmax(Q_values: {}".format(np.argmax(Q_values, axis=1)))
+		# print("argmax(Q_values: {}".format(np.argmax(Q_values, axis=1)))
 		return np.array([actions[i] for i in np.argmax(Q_values, axis=1)])
 
 
@@ -111,7 +112,7 @@ class ExactPolicy4LQR(object):
 	"""docstring for ExactPolicy4LQR"""
 	def __init__(self, basis_func, L=None):
 		super(ExactPolicy4LQR, self).__init__()
-		if L==None:
+		if L is None:
 			self.get_action_training = self.get_best_action
 		else:
 			self.L = L

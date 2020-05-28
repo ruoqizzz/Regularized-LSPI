@@ -12,9 +12,13 @@ venv/
 # compiled
 __pycache__/
 resources/
+
+# jupyter notebook
 .ipynb_checkpoints/
 *.ipynb
 
+# shell file
+*.sh
 
 # images
 Src/images/*
@@ -36,7 +40,7 @@ debug*
 src/test/
 
 # samples
-src/samples/LQR/
+src/samples/
 !src/samples/LQR/gaussian_actions_2000_2.pickle
 !src/samples/LQR/gaussian_actions_2000.pickle
-!src/samples/LQR/gaussian_actions_2d2000.pickle
+
