@@ -131,7 +131,7 @@ class LSPIAgent(object):
 				if self.old_weights is None:
 					new_weights = np.zeros(A.shape[1])
 				else:
-					new_weights = self.old_weights
+					new_weights = copy.copy(self.old_weights)
 				# new_weights = np.zeros(A.shape[1])
 				# weights_his = []
 				T = A.T@A
@@ -258,7 +258,7 @@ class BellmanAgent(object):
 				if self.old_weights is None:
 					new_weights = np.zeros(A.shape[1])
 				else:
-					new_weights = self.old_weights
+					new_weights = copy.copy(self.old_weights)
 				# new_weights = np.zeros(A.shape[1])
 				# weights_his = []
 				T = A.T@A
