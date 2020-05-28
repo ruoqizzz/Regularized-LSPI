@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-
+from sklearn.gaussian_process.kernels import RBF
 # RBF: Gaussian Multidimensional Radial Basis Function for discrete actions
 class RBF(object):
 	"""docstring for RBF"""
@@ -55,8 +55,8 @@ class RBF_LQR(object):
 		self.sigma = sigma
 		# the range of mean 
 		# self.feature_means = [np.random.uniform([-10,-5],[10,5], (3,2)).transpose((1,0)) for _ in range(self.n_features-1)]
-		self.state_means = [ np.random.uniform(-10, 10, self.state_dim) for _ in range(n_features-1)]
-		self.action_means = [ np.random.uniform(-6, 6, self.action_dim) for _ in range(n_features-1)]
+		self.state_means = [ np.random.uniform(-8, 8, self.state_dim) for _ in range(n_features-1)]
+		self.action_means = [ np.random.uniform(-4, 4, self.action_dim) for _ in range(n_features-1)]
 		# TODO: -2,2 10 
 		# TODO: -10,10 10
 		# self.feature_means = [np.arange(-2,2,4/(self.n_features-1))]*input_dim
@@ -70,13 +70,50 @@ class RBF_LQR(object):
 		phi = np.zeros( (states.shape[0], k))
 		for i in range(states.shape[0]):
 			phi[i,0] = 1
-			rbf = np.exp(-self.sigma*(np.linalg.norm(states[i] - self.state_means, axis=1)**2+np.linalg.norm(actions[i] - self.action_means, axis=1)**2))
+			# print(states[i].tolist())
+			# print("self.state_means", self.state_means)
+			rbf = np.exp(-self.sigma*(np.linalg.norm(states[i].reshape(1,self.state_dim)[0]- self.state_means, axis=1)**2+np.linalg.norm(actions[i] - self.action_means, axis=1)**2))
 			phi[i,1:] = rbf
 			# print("rbf.shape: ". rbf.shape)
 		return phi
 
 	def name(self):
 		return "RBF_LQR"
+
+class Laplace_LQR(object):
+	"""docstring for Laplace_LQR"""
+	def __init__(self, M, L_vec):
+		super(Laplace_LQR, self).__init__()
+		self.M = M
+		self.L_vec = L_vec
+		self.D = len(L_vec)
+		self.n_features = self.M**self.D+1
+
+	def size(self):
+		return self.n_features
+
+	def evaluate(self, states, actions):
+		s = states.reshape(len(actions),len(states[0])).T
+		a = np.array(actions).T.reshape(1,len(actions))
+		x = np.vstack((s,a))
+		phi = np.ones((self.n_features-1, x.shape[1]))
+		j_vec = np.ones(self.D)
+
+		for c in range(self.n_features-1):
+
+			for k in range(self.D):
+				phi[c, :]  *= np.sin( np.pi*j_vec[k]*( x[k] + self.L_vec[k])/(2*self.L_vec[k]))/np.sqrt(self.L_vec[k])
+
+			j_vec[0] = j_vec[0]+1
+			for k in range(1, self.D):
+				if (np.mod(j_vec[k-1], self.M+1) == 0):
+					j_vec[k-1] = 1
+					j_vec[k] = j_vec[k]+1
+
+		return np.vstack(( np.ones(s.shape[1]), phi)).T
+
+	def name(self):
+		return "Laplace_LQR"
 
 
 class ExactBasis4LQR(object):
