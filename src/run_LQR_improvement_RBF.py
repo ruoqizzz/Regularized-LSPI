@@ -12,7 +12,7 @@ import numpy as np
 import time
 import pickle
 import os
-
+from test_agent import *
 # sample data files name for LQR
 LQR_samples_filename = {
 	2000: "samples/LQR/gaussian_actions_2000.pickle",

@@ -122,7 +122,6 @@ class LSPIAgent(object):
 					# weights_his.append(w)
 			elif self.opt == 'l2':
 				new_weights = np.linalg.solve(A+self.reg_param/A.shape[0]*np.identity(A.shape[0]),b)
-
 			elif self.opt == 'wl1':
 				# TODO: test
 				n = A.shape[1]
@@ -293,7 +292,9 @@ class BellmanAgent(object):
 					# print("weights: ",new_weights)
 					# weights_his.append(w)
 			elif self.opt == 'l2':
-				new_weights = np.linalg.solve(A+self.reg_param/A.shape[0]*np.identity(A.shape[0]),b)
+				# print(" A.T@A shape", (A.T@A).shape)
+				# print("A.T@b shape", (A.T@b).shape)
+				new_weights = np.linalg.solve(A.T@A+self.reg_param/A.shape[0]*np.identity(A.shape[1]),A.T@b)
 			elif self.opt == 'wl1':
 				# TODO: test
 				n = A.shape[1]

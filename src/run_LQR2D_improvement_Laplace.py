@@ -1,5 +1,5 @@
 import argparse
-from lspi import LSPIAgent
+from lspi import *
 from replay_buffer import ReplayBuffer
 import gym
 from env.linear_quadratic_regulator import LQREnv
@@ -12,6 +12,7 @@ import numpy as np
 import time
 import pickle
 import os
+from test_agent import *
 
 # sample data files name for LQR2D
 
@@ -27,7 +28,7 @@ def main():
 	parser.add_argument('--basis_function_dim', default=40, type=int)
 	parser.add_argument('--stop_criterion', default=10**-3, type=float)
 	parser.add_argument('--sample_max_steps', default="2000", choices=["2000","5000","10000","20000"])
-	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2", "wl1", "none"])
+	parser.add_argument('--reg_opt', default="wl1", choices=["l1","l2", "wl1", "none"])
 	parser.add_argument('--reg_param', default=0.001, type=float)
 	parser.add_argument('--rbf_sigma', default=0.01, type=float)
 	# parser.add_argument('--batch_size', default=2000, type=int)
@@ -73,47 +74,12 @@ def main():
 
 
 
-	agent = LSPIAgent(params)
+	agent = BellmanAgent(params)
 	
 	error_list, new_weights = agent.train(sample)
 
-	# states = np.linspace(-10,10,500)
-	states = np.linspace([-4]*env.m, [4]*env.m, 1000)
-	trueL = env.optimal_policy_L(gamma)
-	print(states)
-	print(trueL)
-	
-	actions_true = []
-	for i in range(len(states)):
-	    state = np.matrix(states[i].reshape(env.m,1))
-	    # action = agent.policy.get_best_action(state)
-	    # actions_estimate.append(action)
-	    actions_true.append((-trueL*state).item())
-	# print(actions_true)
-	actions_estimate = agent.policy.get_best_action(states)
-	# save agent
-	
-	to_day = time.strftime("%Y-%m-%d",time.localtime(time.time()))
-	now2 = time.strftime("%H_%M_%S",time.localtime(time.time()))
-	path = "data/LQR2D/"+to_day
-	folder = os.path.exists(path)
-	if not folder:
-		os.makedi7rs(path)   
-	fn = path+"/data-"+str(params['reg_opt'])+"-"+str(params['reg_param'])+"-BF"+str(n_features)+"-"+now2+".pkl"
-	f = open(fn, 'wb')
-	pickle.dump(actions_estimate, f)
-	f.close()
+	test_agent4LQR2D(agent, env, gamma, ifshow=False)
 
-	# plot
-	plt.plot(np.arange(1000), actions_estimate, label='estimate')
-	# print(actions_true)
-	plt.plot(np.arange(1000), actions_true, label='true')
-	plt.legend(loc='upper right')
-	# plt.show()
-	pltfn = path+"/data-"+str(params['reg_opt'])+"-"+str(params['reg_param'])+"-BF"+str(n_features)+"-"+now2+".png"
-	# f = open(fn, 'wb')
-	plt.savefig(pltfn,dpi=300)
-	# clean
 	env.close()
 
 
