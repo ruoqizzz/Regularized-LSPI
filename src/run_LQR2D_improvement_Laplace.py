@@ -25,9 +25,9 @@ def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--weight_discount', default=0.99, type=float)	# note: 1.0 only for finite
 	parser.add_argument('--exploration', default=0.1, type=float)	# 0.0 means no random action
-	parser.add_argument('--basis_function_dim', default=40, type=int)
+	parser.add_argument('--basis_function_dim', default=20, type=int)
 	parser.add_argument('--stop_criterion', default=10**-3, type=float)
-	parser.add_argument('--sample_max_steps', default="2000", choices=["2000","5000","10000","20000"])
+	parser.add_argument('--sample_max_steps', default="5000", choices=["2000","5000","10000","20000"])
 	parser.add_argument('--reg_opt', default="wl1", choices=["l1","l2", "wl1", "none"])
 	parser.add_argument('--reg_param', default=0.001, type=float)
 	parser.add_argument('--rbf_sigma', default=0.01, type=float)

@@ -31,12 +31,60 @@ class RBF(object):
 			offset = (self.n_features)*actions[i]
 			phi[i, offset] = 1
 			rbfs = np.exp(-self.sigma*np.linalg.norm(states[i] - self.feature_means[actions[i]], axis=1)**2)
-			print("rbfs.shape: ", rbfs.shape)
+			# print("rbfs.shape: ", rbfs.shape)
 			phi[i, offset+1:offset+self.n_features] = rbfs
 		return phi
 
 	def name(self):
 		return "RBF"
+
+
+class Laplace(object):
+	"""docstring for Laplace_LQR"""
+	def __init__(self, M, L_vec, n_actions):
+		super(Laplace, self).__init__()
+		self.M = M
+		self.L_vec = L_vec
+		self.n_actions = n_actions
+		self.D = len(L_vec)
+		self.n_features = self.M**self.D+1
+
+	def size(self):
+		return self.n_actions*self.n_features
+
+
+	def evaluate(self, states, actions):
+		k = self.size()
+		phi = np.zeros( (states.shape[0], k))
+		for i in range(states.shape[0]):
+			offset = (self.n_features)*actions[i]
+			phi_state = self.evaluate_states(states[i])
+			phi[i, offset:offset+self.n_features] = phi_state
+		return phi
+
+
+	def evaluate_states(self, state):
+		
+		x = state
+		phi = np.ones((self.n_features-1, 1))
+		j_vec = np.ones(self.D)
+
+		for c in range(self.n_features-1):
+
+			for k in range(self.D):
+				phi[c, :]  *= np.sin( np.pi*j_vec[k]*( x[k] + self.L_vec[k])/(2*self.L_vec[k]))/np.sqrt(self.L_vec[k])
+
+			j_vec[0] = j_vec[0]+1
+			for k in range(1, self.D):
+				if (np.mod(j_vec[k-1], self.M+1) == 0):
+					j_vec[k-1] = 1
+					j_vec[k] = j_vec[k]+1
+
+		return np.vstack(( 1, phi)).T
+
+
+	def name(self):
+		return "LP"
 
 
 class RBF_LQR(object):
@@ -93,7 +141,7 @@ class Laplace_LQR(object):
 		return self.n_features
 
 	def evaluate(self, states, actions):
-		s = states.reshape(len(actions),len(states[0])).T
+		s = states.reshape(len(states),len(states[0])).T
 		a = np.array(actions).T.reshape(1,len(actions))
 		x = np.vstack((s,a))
 		phi = np.ones((self.n_features-1, x.shape[1]))

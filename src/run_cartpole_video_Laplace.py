@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
-from lspi import LSPIAgent
+from lspi import *
 from replay_buffer import ReplayBuffer
 import gym
 from env.inverted_pendulum import InvertedPendulumEnv
@@ -13,6 +13,7 @@ from policy import *
 import matplotlib.pyplot as plt
 import pickle
 from gym import wrappers
+import os
 
 def main():
 	parser = argparse.ArgumentParser()
@@ -24,9 +25,9 @@ def main():
 	parser.add_argument('--stop_criterion', default=10**-3, type=float)
 	# parser.add_argument('--batch_size', default=1000, type=int)
 	# parser.add_argument('--update_freq', default=1000, type=int)
-	parser.add_argument('--samples_episodes', default="1000", choices=["200","400","600","1000"])
+	parser.add_argument('--samples_episodes', default="200", choices=["200","400","600","1000"])
 	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2","wl1"])
-	parser.add_argument('--reg_param', default=0.04, type=float)
+	parser.add_argument('--reg_param', default=0.01, type=float)
 	parser.add_argument('--rbf_sigma', default=0.5, type=float)
 	parser.add_argument('--lspi_iteration', default=100, type=int)
 	
@@ -45,31 +46,54 @@ def main():
 
 	params['n_actions'] = env.action_space.n
 	params['state_dim'] = env.observation_space.shape[0]
+	
 
 	samples_episodes = params['samples_episodes']
-	fn = "samples/CartPole/reward_shape/CartPole"+samples_episodes+".pickle"
+	fn = "samples/CartPole/CartPole"+samples_episodes+".pickle"
 	f = open(fn, 'rb')
 	replay_buffer = pickle.load(f)
 	f.close()
-	basis_func = RBF(params['state_dim']-2, n_features, params['n_actions'], params['rbf_sigma'], high=np.array([0.21,2.7]))
-	# basis_func = RBF(params['state_dim'], n_features, params['n_actions'], params['rbf_sigma'], high=np.array([2.5,3,0.21,2.7]))
-	params['basis_func'] = basis_func
-	policy = GreedyPolicy(params['basis_func'], params['n_actions'], 1-params['exploration'])
-	params['policy'] = policy
-	agent = LSPIAgent(params, n_iter_max=lspi_iteration)
 
 	i_samples = replay_buffer.sample(replay_buffer.num_buffer)
+
+	L_vec = 1.1*np.max(np.abs(i_samples[0][:,2:4]), axis=0).flatten()
+	basis_func= Laplace(n_features, L_vec, params['n_actions'])
+	# print(basis_func.size())
+	params['basis_func'] = basis_func
+
+	policy = GreedyPolicy(params['basis_func'], params['n_actions'], 1-params['exploration'])
+	params['policy'] = policy
+	agent = BellmanAgent(params, n_iter_max=10)
+
+	
 	agent.train(i_samples)
-	env = wrappers.Monitor(env, './videos/' + str(time.time()) + '/')
+	
+	now = time.strftime("%Y-%m-%d",time.localtime(time.time()))
+	now2 = time.strftime("%H_%M_%S",time.localtime(time.time()))
+	path = "data/CartPole/"+now+"/"+str(agent.opt)+"-"+str(agent.reg_param)+"-LP"+str(agent.policy.basis_func.size())+'-'+agent.policy.basis_func.name()+'-episodes'+str(samples_episodes)+"/"+now2+"/"
+	folder = os.path.exists(path)
+	if not folder:
+		os.makedirs(path)
+	# print(path)
+	env = wrappers.Monitor(env, path, video_callable=False)
 
 	state = env.reset()
 	done  = False
 	total_reward = 0
 	i_episode_steps = 0
 	history = []
+	x_history = []
+	xdot_history = []
+	theta_history = []
+	thetadot_history = []
 	while True:
 		# env.render()
 		# dim of state!
+		x_history.append(state[0])
+		xdot_history.append(state[1])
+		theta_history.append(state[2])
+		thetadot_history.append(state[3])
+
 		state = np.reshape(state[2:4], (1,2))
 		# state = np.reshape(state,(1,4))
 		action = agent.get_action(state)
@@ -90,6 +114,29 @@ def main():
 			print("total_reward {}".format(total_reward))
 			# time.sleep(0.1)
 			break
+	pickle.dump(x_history, open(path+'x_history.pickle', 'wb'))
+	pickle.dump(xdot_history, open(path+'xdot_history.pickle', 'wb'))
+	pickle.dump(theta_history, open(path+'theta_history.pickle', 'wb'))
+	pickle.dump(thetadot_history, open(path+'thetadot_history.pickle', 'wb'))
+
+	f = open(path+'total_reward.txt', 'w')
+	f.write(str(total_reward))
+	f.close()
+	
+	plt.plot(x_history)
+	# print(actions_true)
+	plt.ylabel('x')
+	plt.xlabel('episodes')
+	# plt.plot(np.ones(len(x_history))*2.4, 'k--')
+	plt.savefig(path+'x_history.png',dpi=300)
+	plt.clf()
+
+	plt.plot(theta_history)
+	plt.ylabel('theta')
+	plt.xlabel('episodes')
+	plt.savefig(path+'thteta_history.png',dpi=300)
+	plt.clf()
+
 
 
 if __name__ == '__main__':

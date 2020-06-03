@@ -8,7 +8,6 @@ import scipy
 from scipy import linalg
 import time
 from sklearn import linear_model
-import cvxpy as cp
 import copy
 
 Transition = namedtuple('Transition',
@@ -34,22 +33,22 @@ class LSPIAgent(object):
 		self.old_weights = None
 
 	def train(self, samples):
-		states = samples[0]
+		# states = samples[0]
 		# reshape states
-		# states = samples[0][:,2:]
+		states = samples[0][:,2:]
 		# print(states.shape)
 		actions = samples[1]
 		
-		rewards = samples[2]
+		# rewards = samples[2]
 		# reshape rewards
 		# rewards = -(states[:,2]**2 + states[:,0]**2)
 		# rewards = -(states[:,2]**2)
-		# rewards = -(states[:,0]**2)
+		rewards = -(states[:,0]**2)
 		# print(rewards.shape)
 
 		# reshape next states
-		next_states = samples[3]
-		# next_states = samples[3][:,2:]
+		# next_states = samples[3]
+		next_states = samples[3][:,2:]
 		dones = samples[4]
 		
 		phi = self.policy.basis_func.evaluate(states, actions)
@@ -58,8 +57,6 @@ class LSPIAgent(object):
 		error_his = []
 		i_iter = 0
 		while error > self.stop_criterion and i_iter<self.n_iter_max:
-			if i_iter>15:
-				break
 			next_actions = self.policy.get_action_training(next_states)
 			# print(self.policy.basis_func.evaluate(next_states, next_actions)[:10])
 			# print((self.policy.basis_func.evaluate(next_states, next_actions)*(1-dones).reshape(len(dones),1))[:10])
@@ -167,14 +164,14 @@ class LSPIAgent(object):
 			else:
 				assert ValueError("wrong option")
 			error = np.linalg.norm(self.policy.weights-new_weights)
-			print("error when update_weights in iteration {}: {}".format(i_iter,error))
+			# print("error when update_weights in iteration {}: {}".format(i_iter,error))
 			if len(error_his)>2:
 				if error == error_his[-1] and error == error_his[-2]:
 					print("Weights jump between two values, break")
 					self.policy.update_weights(new_weights)
 					break;
 			error_his.append(error)
-			print("new_weights: {}".format(new_weights))
+			# print("new_weights: {}".format(new_weights))
 			self.policy.update_weights(new_weights)
 			i_iter += 1
 		# print("error_his: ",error_his)
@@ -203,22 +200,22 @@ class BellmanAgent(object):
 		self.old_weights = None
 
 	def train(self, samples):
-		states = samples[0]
+		# states = samples[0]
 		# reshape states
-		# states = samples[0][:,2:]
+		states = samples[0][:,2:]
 		# print(states.shape)
 		actions = samples[1]
 		
-		rewards = samples[2]
+		# rewards = samples[2]
 		# reshape rewards
 		# rewards = -(states[:,2]**2 + states[:,0]**2)
 		# rewards = -(states[:,2]**2)
-		# rewards = -(states[:,0]**2)
+		rewards = -(states[:,0]**2)
 		# print(rewards.shape)
 
 		# reshape next states
-		next_states = samples[3]
-		# next_states = samples[3][:,2:]
+		# next_states = samples[3]
+		next_states = samples[3][:,2:]
 		dones = samples[4]
 		
 		phi = self.policy.basis_func.evaluate(states, actions)
@@ -227,8 +224,6 @@ class BellmanAgent(object):
 		error_his = []
 		i_iter = 0
 		while error > self.stop_criterion and i_iter<self.n_iter_max:
-			if i_iter>15:
-				break
 			next_actions = self.policy.get_action_training(next_states)
 			# print(self.policy.basis_func.evaluate(next_states, next_actions)[:10])
 			# print((self.policy.basis_func.evaluate(next_states, next_actions)*(1-dones).reshape(len(dones),1))[:10])
@@ -335,19 +330,21 @@ class BellmanAgent(object):
 					k+=1
 					# print(k)
 					self.old_weights = new_weights
+					print("zero in weights", np.sum(new_weights==0))
 					# print("weights: ",new_weights)
 					# weights_his.append(w)
 			else:
 				assert ValueError("wrong option")
 			error = np.linalg.norm(self.policy.weights-new_weights)
-			print("error when update_weights in iteration {}: {}".format(i_iter,error))
+			# print("error when update_weights in iteration {}: {}".format(i_iter,error))
 			if len(error_his)>2:
 				if error == error_his[-1] and error == error_his[-2]:
 					print("Weights jump between two values, break")
 					self.policy.update_weights(new_weights)
 					break;
 			error_his.append(error)
-			print("new_weights: {}".format(new_weights))
+			# print("new_weights: {}".format(new_weights))
+			
 			self.policy.update_weights(new_weights)
 			i_iter += 1
 		# print("error_his: ",error_his)

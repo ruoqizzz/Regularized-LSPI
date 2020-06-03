@@ -22,6 +22,7 @@ class GreedyPolicy(object):
 		# Q(s, a; w) = sum (pi(s, a) * weights)
 		# # basis functions pi(s, a)
 		phi = self.basis_func.evaluate(states,actions)
+		# print('phi.shape', phi.shape)
 		return phi@self.weights  # pi(s, a) * weights
 
 	# epsilon greedy
@@ -40,6 +41,7 @@ class GreedyPolicy(object):
 			Qa = self.q_state_action_func(states, np.full(states.shape[0], a, np.int))
 			# print(Qa)
 			Q_values[:, a] = Qa
+
 		# print("Q_values: {}".format(Q_values))
 		# print(np.argmax(Q_values, axis=1))
 		return np.argmax(Q_values, axis=1)

@@ -63,7 +63,7 @@ def main():
 	params['basis_func'] = Laplace_LQR(n_features, L_vec)
 	params['policy'] = RBFPolicy4LQR(params['basis_func'])
 
-	agent = BellmanAgent(params)
+	agent = BellmanAgent(params, n_iter_max=15)
 	
 	error_list, new_weights = agent.train(sample)
 

@@ -9,22 +9,23 @@ import gym
 Transition = namedtuple('Transition',
                         ('state', 'action','reward', 'next_state', 'done'))
 
-def collect_samples_maxstep(env, max_steps, agent):
+def collect_samples_maxstep(env, max_steps, agent=None):
 	ifRandom = False
 	replay_buffer = ReplayBuffer()
 	if agent==None:
 		# random policy
 		ifRandom = True
 	i_episode_steps = 0
+	state = env.reset()
 	while i_episode_steps < max_steps:
 		i_episode_steps += 1
 		# action = env.action_space.sample()
-		action = np.matrix(np.random.normal(0, 1, 1)[0])
+		action = env.action_space.sample()
 		state_, reward, done, info = env.step(action)
 		replay_buffer.store(state, action, reward, state_, done)
 		state = state_
-		if done:
-			state = env.reset()
+		# if done:
+		# 	break
 	return replay_buffer
 
 
@@ -125,19 +126,19 @@ if __name__ == '__main__':
 	# collect samples for 2000 steps
 
 	# env = LQREnv()
-	A = np.matrix([[0.9,0.],[0.1,0.9]])
-	B = np.matrix([[1],[0.]])
-	Z1 = np.matrix([[0,0],[0,1]])
-	Z2 = 0.1
-	noise_cov = np.matrix([[0.01,0],[0,0.01]])
-	env = LQREnv(A=A,B=B,Z1=Z1,Z2=Z2,noise_cov=noise_cov)
+	# A = np.matrix([[0.9,0.],[0.1,0.9]])
+	# B = np.matrix([[1],[0.]])
+	# Z1 = np.matrix([[0,0],[0,1]])
+	# Z2 = 0.1
+	# noise_cov = np.matrix([[0.01,0],[0,0.01]])
+	# env = LQREnv(A=A,B=B,Z1=Z1,Z2=Z2,noise_cov=noise_cov)
 	
-	sample_step_list = [2000, 5000]
-	for steps in sample_step_list:
-		replay_buffer = collect_LQR_gaussian(env, steps)
-		f1 = open("samples/LQR2D/gaussian_actions_"+str(steps)+".pickle", 'wb')
-		pickle.dump(replay_buffer, f1)
-		f1.close()
+	# sample_step_list = [2000, 5000]
+	# for steps in sample_step_list:
+	# 	replay_buffer = collect_LQR_gaussian(env, steps)
+	# 	f1 = open("samples/LQR2D/gaussian_actions_"+str(steps)+".pickle", 'wb')
+	# 	pickle.dump(replay_buffer, f1)
+	# 	f1.close()
 
 	# CartPole-v0
 	# env = gym.make('CartPole-v0')
@@ -149,6 +150,19 @@ if __name__ == '__main__':
 	# 	replay_buffer = collect_samples_maxepisode(env, s)
 	# 	pickle.dump(replay_buffer, f)
 	# 	f.close()
+
+	# Mountain car
+	env = gym.make('MountainCar-v0')
+	fn_pre = "samples/MountainCar/"
+	slist = np.arange(1,10)*1000
+	for s in slist:
+		print(s)
+		fn  = fn_pre+'MC'+str(s)+".pickle"
+		f = open(fn, 'wb')
+		replay_buffer = collect_samples_maxstep(env, s)
+		pickle.dump(replay_buffer, f)
+		f.close()
+
 
 	
 

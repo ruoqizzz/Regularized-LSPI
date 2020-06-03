@@ -56,8 +56,8 @@ def main():
 		rbs.append(replay_buffer)
 		f.close()
 	# the number of samples's episodes
-	num = np.arange(1,11)*100
-	# num = [100, 200]
+	# num = np.arange(1,11)*100
+	num = [100, 200]
 	sample_meanmean = []
 	sample_meanmax = []
 	sample_meanmin = []
