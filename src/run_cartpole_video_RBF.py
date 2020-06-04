@@ -26,10 +26,10 @@ def main():
 	# parser.add_argument('--batch_size', default=1000, type=int)
 	# parser.add_argument('--update_freq', default=1000, type=int)
 	parser.add_argument('--samples_episodes', default="200", choices=["200","400","600","1000"])
-	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2","wl1"])
+	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2","wl1","none"])
 	parser.add_argument('--reg_param', default=0.01, type=float)
 	parser.add_argument('--rbf_sigma', default=0.5, type=float)
-	parser.add_argument('--lspi_iteration', default=100, type=int)
+	parser.add_argument('--lspi_iteration', default=15, type=int)
 	
 	args = parser.parse_args()
 	params = vars(args)
@@ -48,10 +48,12 @@ def main():
 	params['state_dim'] = env.observation_space.shape[0]
 
 	samples_episodes = params['samples_episodes']
-	fn = "samples/CartPole/CartPole"+samples_episodes+".pickle"
-	f = open(fn, 'rb')
-	replay_buffer = pickle.load(f)
-	f.close()
+	# fn = "samples/CartPole/CartPole"+samples_episodes+".pickle"
+	# f = open(fn, 'rb')
+	# replay_buffer = pickle.load(f)
+	# f.close()
+	replay_buffer = collect_samples_maxepisode(env, int(samples_episodes))
+
 	basis_func = RBF(params['state_dim']-2, n_features, params['n_actions'], params['rbf_sigma'], high=np.array([0.21,2.7]))
 	# basis_func = RBF(params['state_dim'], n_features, params['n_actions'], params['rbf_sigma'], high=np.array([2.5,3,0.21,2.7]))
 	params['basis_func'] = basis_func
@@ -61,16 +63,16 @@ def main():
 
 	i_samples = replay_buffer.sample(replay_buffer.num_buffer)
 	agent.train(i_samples)
-	
 
 	now = time.strftime("%Y-%m-%d",time.localtime(time.time()))
 	now2 = time.strftime("%H_%M_%S",time.localtime(time.time()))
-	path = "data/CartPole/"+now+"/"+str(agent.opt)+"-"+str(agent.reg_param)+"-BF"+str(agent.policy.basis_func.size())+'-'+agent.policy.basis_func.name()+'-episodes'+str(samples_episodes)+"/"+now2+"/"
+	# path = "data/CartPole/"+now+"/"+str(agent.opt)+"-"+str(agent.reg_param)+"-BF"+str(agent.policy.basis_func.size())+'-'+agent.policy.basis_func.name()+'-episodes'+str(samples_episodes)+"/"+now2+"/"
+	path = "data/CartPole/[theta, theta_dot]/"+str(agent.opt)+"-"+str(agent.reg_param)+"-BF"+str(agent.policy.basis_func.size())+'-'+agent.policy.basis_func.name()+'-eps'+str(samples_episodes)+"/"+now2+"/"
 	folder = os.path.exists(path)
 	if not folder:
 		os.makedirs(path)
 	# print(path)
-	env = wrappers.Monitor(env, path, video_callable=False)
+	env = wrappers.Monitor(env, path)
 
 	state = env.reset()
 	done  = False

@@ -26,7 +26,7 @@ def main():
 	# parser.add_argument('--batch_size', default=1000, type=int)
 	# parser.add_argument('--update_freq', default=1000, type=int)
 	parser.add_argument('--samples_episodes', default="200", choices=["200","400","600","1000"])
-	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2","wl1"])
+	parser.add_argument('--reg_opt', default="l2", choices=["l1","l2","wl1","none"])
 	parser.add_argument('--reg_param', default=0.01, type=float)
 	parser.add_argument('--rbf_sigma', default=0.5, type=float)
 	parser.add_argument('--lspi_iteration', default=100, type=int)
@@ -49,11 +49,11 @@ def main():
 	
 
 	samples_episodes = params['samples_episodes']
-	fn = "samples/CartPole/CartPole"+samples_episodes+".pickle"
-	f = open(fn, 'rb')
-	replay_buffer = pickle.load(f)
-	f.close()
-
+	# fn = "samples/CartPole/CartPole"+samples_episodes+"-2.pickle"
+	# f = open(fn, 'rb')
+	# replay_buffer = pickle.load(f)
+	# f.close()
+	replay_buffer = collect_samples_maxepisode(env, int(samples_episodes))
 	i_samples = replay_buffer.sample(replay_buffer.num_buffer)
 
 	L_vec = 1.1*np.max(np.abs(i_samples[0][:,2:4]), axis=0).flatten()
@@ -63,19 +63,21 @@ def main():
 
 	policy = GreedyPolicy(params['basis_func'], params['n_actions'], 1-params['exploration'])
 	params['policy'] = policy
-	agent = BellmanAgent(params, n_iter_max=10)
+	agent = BellmanAgent(params, n_iter_max=15)
 
 	
 	agent.train(i_samples)
 	
 	now = time.strftime("%Y-%m-%d",time.localtime(time.time()))
 	now2 = time.strftime("%H_%M_%S",time.localtime(time.time()))
-	path = "data/CartPole/"+now+"/"+str(agent.opt)+"-"+str(agent.reg_param)+"-LP"+str(agent.policy.basis_func.size())+'-'+agent.policy.basis_func.name()+'-episodes'+str(samples_episodes)+"/"+now2+"/"
+	# path = "data/CartPole/"+now+"/"+str(agent.opt)+"-"+str(agent.reg_param)+"-LP"+str(agent.policy.basis_func.size())+'-'+agent.policy.basis_func.name()+'-eps'+str(samples_episodes)+"/"+now2+"/"
+	path = "data/CartPole/[theta, theta_dot]/"+str(agent.opt)+"-"+str(agent.reg_param)+"-LP"+str(agent.policy.basis_func.size())+'-'+agent.policy.basis_func.name()+'-eps'+str(samples_episodes)+"/"+now2+"/"
 	folder = os.path.exists(path)
 	if not folder:
 		os.makedirs(path)
+	print(path)
 	# print(path)
-	env = wrappers.Monitor(env, path, video_callable=False)
+	env = wrappers.Monitor(env, path)
 
 	state = env.reset()
 	done  = False

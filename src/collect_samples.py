@@ -141,27 +141,27 @@ if __name__ == '__main__':
 	# 	f1.close()
 
 	# CartPole-v0
-	# env = gym.make('CartPole-v0')
-	# fn_pre = "samples/CartPole/reward_shape/CartPole"
-	# slist = np.arange(11,20)*100
-	# for s in slist:
-	# 	fn  = fn_pre+str(s)+".pickle"
-	# 	f = open(fn, 'wb')
-	# 	replay_buffer = collect_samples_maxepisode(env, s)
-	# 	pickle.dump(replay_buffer, f)
-	# 	f.close()
-
-	# Mountain car
-	env = gym.make('MountainCar-v0')
-	fn_pre = "samples/MountainCar/"
-	slist = np.arange(1,10)*1000
+	env = gym.make('CartPole-v0')
+	fn_pre = "samples/CartPole/CartPole"
+	slist = np.arange(1,10)*100
 	for s in slist:
-		print(s)
-		fn  = fn_pre+'MC'+str(s)+".pickle"
+		fn  = fn_pre+str(s)+"-2.pickle"
 		f = open(fn, 'wb')
-		replay_buffer = collect_samples_maxstep(env, s)
+		replay_buffer = collect_samples_maxepisode(env, s)
 		pickle.dump(replay_buffer, f)
 		f.close()
+
+	# Mountain car
+	# env = gym.make('MountainCar-v0')
+	# fn_pre = "samples/MountainCar/"
+	# slist = np.arange(1,10)*1000
+	# for s in slist:
+	# 	print(s)
+	# 	fn  = fn_pre+'MC'+str(s)+".pickle"
+	# 	f = open(fn, 'wb')
+	# 	replay_buffer = collect_samples_maxstep(env, s)
+	# 	pickle.dump(replay_buffer, f)
+	# 	f.close()
 
 
 	
