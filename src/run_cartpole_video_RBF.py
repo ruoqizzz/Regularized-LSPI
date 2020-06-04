@@ -72,7 +72,7 @@ def main():
 	if not folder:
 		os.makedirs(path)
 	# print(path)
-	env = wrappers.Monitor(env, path)
+	env = wrappers.Monitor(env, path, video_callable=False)
 
 	state = env.reset()
 	done  = False
