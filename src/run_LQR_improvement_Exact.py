@@ -118,7 +118,7 @@ def main():
 	plt.plot(np.arange(n_episode), estimateL_his, label='estimate L')
 	plt.plot(np.arange(n_episode), [trueL]*n_episode, label='optimal L')
 	plt.ylabel('L')
-	plt.xlabel('episode')
+	plt.xlabel('iteration')
 	plt.legend(loc='upper right')
 	plt.show()
 

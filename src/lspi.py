@@ -33,22 +33,22 @@ class LSPIAgent(object):
 		self.old_weights = None
 
 	def train(self, samples):
-		# states = samples[0]
+		states = samples[0]
 		# reshape states
-		states = samples[0][:,2:]
+		# states = samples[0][:,2:]
 		# print(states.shape)
 		actions = samples[1]
 		
-		# rewards = samples[2]
+		rewards = samples[2]
 		# reshape rewards
 		# rewards = -(states[:,2]**2 + states[:,0]**2)
 		# rewards = -(states[:,2]**2)
-		rewards = -(states[:,0]**2)
+		# rewards = -(states[:,0]**2)
 		# print(rewards.shape)
 
 		# reshape next states
-		# next_states = samples[3]
-		next_states = samples[3][:,2:]
+		next_states = samples[3]
+		# next_states = samples[3][:,2:]
 		dones = samples[4]
 		
 		phi = self.policy.basis_func.evaluate(states, actions)
